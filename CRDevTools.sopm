@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<otrs_package version="1.0">
+    <Name>CRDevTools</Name>
+    <Version>0.1.1</Version>
+    <Framework>3.4.x</Framework>
+    <Vendor>Carlos Rodriguez</Vendor>
+    <URL>http://https://github.com/carlosfrodriguez</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <Description Lang="en">The CR Development Tools Package.</Description>
+    <Filelist>
+        <!--
+        <File Permission="644" Location="doc/en/CRDevTools.txt"/>
+        -->
+        <File Permission="755" Location="bin/cr.DevUserDelete.pl"/>
+        <File Permission="644" Location="Kernel/System/CRDevDelete.pm"/>
+    </Filelist>
+</otrs_package>
