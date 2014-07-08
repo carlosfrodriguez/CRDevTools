@@ -11,7 +11,10 @@
         <!--
         <File Permission="644" Location="doc/en/CRDevTools.txt"/>
         -->
+        <File Permission="755" Location="bin/cr.DevTicketDelete.pl"/>
+        <File Permission="755" Location="bin/cr.DevTypeDelete.pl"/>
         <File Permission="755" Location="bin/cr.DevUserDelete.pl"/>
-        <File Permission="644" Location="Kernel/System/CRDevDelete.pm"/>
+        <File Permission="644" Location="Kernel/System/CR/Dev/Type.pm"/>
+        <File Permission="644" Location="Kernel/System/CR/Dev/User.pm"/>
     </Filelist>
 </otrs_package>
