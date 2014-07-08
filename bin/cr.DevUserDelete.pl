@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# bin/cr.DevUserDelete.pl - Delete Users Tikets
+# bin/cr.DevUserDelete.pl - Delete Users
 # This package is intended to work on Development and Testing Environments
 # Copyright (C) 2014 Carlos Rodriguez, https://github.com/carlosfrodriguez
 # --
@@ -116,7 +116,7 @@ elsif ( $Opts{a} && $Opts{a} eq 'Search' ) {
         $SearchOptions{Search} = $Opts{f};
     }
 
-    _search( SearchOptions => \%SearchOptions );
+    _Search( SearchOptions => \%SearchOptions );
 }
 else {
     _Help();
@@ -127,7 +127,7 @@ else {
 
 sub _List {
 
-    # search all tickets
+    # search all users
     my %List = $CommonObject{UserObject}->UserList(
         Type  => 'short',
         Valid => 0,
@@ -171,7 +171,7 @@ sub _Output {
         );
         next USER if !%User;
 
-        # store ticket details
+        # store user details
         push @Users, \%User,
     }
 
@@ -208,14 +208,14 @@ sub _Output {
     # print each user row
     for my $User (@Users) {
 
-        # prepare ticket information
+        # prepare user information
         $User->{ID}        = $User->{UserID}        || '';
         $User->{Login}     = $User->{UserLogin}     || '';
         $User->{Firstname} = $User->{UserFirstname} || '';
         $User->{Lastname}  = $User->{UserLastname}  || '';
         $User->{Email}     = $User->{UserEmail}     || '';
 
-        # print ticket row
+        # print user row
         for my $Element (qw(ID Login Firstname Lastname Email)) {
             my $ElementLength = length $User->{$Element};
             my $WhiteSpaces;
@@ -269,14 +269,14 @@ sub _Delete {
             UserID => $UserID,
         );
 
-        # check if ticket exists
+        # check if user exists
         if ( !%User ) {
             print "The user with ID $UserID does not exist!\n";
             $Failed = 1;
             next USERID;
         }
 
-        # delete ticket
+        # delete user
         my $Success = $CommonObject{DevUserObject}->UserDelete(
             UserID => $UserID,
         );

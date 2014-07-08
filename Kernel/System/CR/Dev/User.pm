@@ -1,5 +1,5 @@
 # --
-# Kernel/System/CR/Dev/User.pm - all Development Delete functions
+# Kernel/System/CR/Dev/User.pm - all User development functions
 # Copyright (C) 2001-2014 OTRS AG, http://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
@@ -16,11 +16,11 @@ use Kernel::System::VariableCheck qw(:all);
 
 =head1 NAME
 
-Kernel::System::DevDelete - Dev Delete lib
+Kernel::System::CR::Dev::User - User Dev lib
 
 =head1 SYNOPSIS
 
-All Development Delete functions.
+All User Development functions.
 
 =head1 PUBLIC INTERFACE
 
@@ -112,11 +112,11 @@ sub new {
 
 =item UserDelete()
 
-Deletes a user from DB removes any preference group and role relation.
-If user is used in any other table, user will not be deletes
+Deletes a user from DB, removes any preference group and role relation.
+If user is used in any other table, user will not be deleted
 
-    my $Success = $DevDeleteObject->UserDelete(
-        UserID => 123,                      # UserID or User is requiered
+    my $Success = $DevUserObject->UserDelete(
+        UserID => 123,                      # UserID or User is required
         User   => 'Some user login',
     );
 
