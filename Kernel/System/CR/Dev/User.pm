@@ -1,5 +1,5 @@
 # --
-# Kernel/System/CRDevDelete.pm - all Development Delete functions
+# Kernel/System/CR/Dev/User.pm - all Development Delete functions
 # Copyright (C) 2001-2014 OTRS AG, http://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
@@ -7,7 +7,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::CRDevDelete;
+package Kernel::System::CR::Dev::User;
 
 use strict;
 use warnings;
@@ -38,7 +38,7 @@ create an object
     use Kernel::System::Time;
     use Kernel::System::Main;
     use Kernel::System::DB;
-    use Kernel::System::CRDevDelete;
+    use Kernel::System::CR::Dev::User;
 
     my $ConfigObject = Kernel::Config->new();
     my $EncodeObject = Kernel::System::Encode->new(
@@ -63,16 +63,14 @@ create an object
         LogObject    => $LogObject,
         MainObject   => $MainObject,
     );
-    my $CRDevDeleteObject = Kernel::System::CRDevDelete->new(
+    my $DevUserObject = Kernel::System::CR::Dev::User->new(
         ConfigObject       => $ConfigObject,
         LogObject          => $LogObject,
         DBObject           => $DBObject,
         MainObject         => $MainObject,
         TimeObject         => $TimeObject,
         EncodeObject       => $EncodeObject,
-        GroupObject        => $GroupObject,        # if given
-        CustomerUserObject => $CustomerUserObject, # if given
-        QueueObject        => $QueueObject,        # if given
+        GroupObject        => $GroupObject,
     );
 
 =cut

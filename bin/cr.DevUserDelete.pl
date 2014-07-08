@@ -35,7 +35,7 @@ use lib dirname($RealBin) . "/Kernel/cpan-lib";
 use Getopt::Std;
 
 use Kernel::System::ObjectManager;
-use Kernel::System::CRDevDelete;
+use Kernel::System::CR::Dev::User;
 
 # create common objects
 local $Kernel::OM = Kernel::System::ObjectManager->new(
@@ -52,7 +52,7 @@ my %CommonObject = $Kernel::OM->ObjectHash(
     ],
 );
 
-$CommonObject{CRDevDeleteObject} = Kernel::System::CRDevDelete->new(%CommonObject);
+$CommonObject{DevUserObject} = Kernel::System::CR::Dev::User->new(%CommonObject);
 
 # get options
 my %Opts = ();
@@ -277,7 +277,7 @@ sub _Delete {
         }
 
         # delete ticket
-        my $Success = $CommonObject{CRDevDeleteObject}->UserDelete(
+        my $Success = $CommonObject{DevUserObject}->UserDelete(
             UserID => $UserID,
         );
 
