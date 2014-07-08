@@ -173,8 +173,8 @@ sub _Output {
     }
 
     my %ColumnLength = (
-        ID       => 7,
-        Name     => 20,
+        ID   => 7,
+        Name => 20,
     );
 
     # print header
@@ -203,8 +203,9 @@ sub _Output {
     for my $Item (@Items) {
 
         # prepare ticket information
-        $Item->{ID}        = $Item->{ID}        || '';
-        $Item->{Name}      = $Item->{Name}     || '';
+        $Item->{ID}   = $Item->{ID}   || '';
+        $Item->{Name} = $Item->{Name} || '';
+
         # print ticket row
         for my $Element (qw(ID Name)) {
             my $ElementLength = length $Item->{$Element};
