@@ -1,7 +1,6 @@
 #CRDevTools
 
 ###Development Tools for OTRS
----
 
 ##Included Tools:
 
