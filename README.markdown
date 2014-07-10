@@ -12,6 +12,12 @@
 
   Can delete associated tickets.
 
+* cr.DevStateDelete:
+
+  Delete ticket states from DB.
+
+  Can delete associated tickets.
+
 * cr.DevTicketDelete:
 
    Delete tickets from DB, including Articles and History (using OTRS API).
