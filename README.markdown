@@ -31,3 +31,8 @@
   **Warning:** As many tables are related to **_&lt;User Table&gt;_** before try to delete any user it is necessary to check if is not referenced by any other table.
 
 All tools contains a list and search options.
+
+####Note:
+This package is not intended to be use on production systems, please be aware of potensial data lost.
+
+Use it carefully and at your own risk, data deleted by included tools might be unrecoverable!
