@@ -6,6 +6,12 @@
 
 ###Delete Tools:
 
+* cr.DevPriorityDelete:
+
+  Delete ticket priorities from DB.
+
+  Can delete associated tickets.
+
 * cr.DevQueueDelete:
 
   Delete queues from DB, also removes relations from _personal_queues_, _queue_auto_response_, _queue_perferences_ and _queue_standard_template_.
