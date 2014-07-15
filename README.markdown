@@ -6,6 +6,10 @@
 
 ###Delete Tools:
 
+* cr.DevGroupDelete:
+
+  Delete groups from DB, also removes relations from _group_user_ and _group_role_.
+
 * cr.DevPriorityDelete:
 
   Delete ticket priorities from DB.
