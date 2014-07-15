@@ -244,7 +244,7 @@ sub QueueSearch {
 
     # get data
     return if !$Self->{DBObject}->Prepare(
-        SQL => $SQL,
+        SQL   => $SQL,
         Limit => $Param{Limit},
     );
 

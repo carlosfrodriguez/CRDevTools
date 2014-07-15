@@ -203,8 +203,8 @@ sub _Output {
     for my $Item (@Items) {
 
         # prepare ticket information
-        $Item->{ID}   = $Item->{QueueID}   || '';
-        $Item->{Name} = $Item->{Name} || '';
+        $Item->{ID}   = $Item->{QueueID} || '';
+        $Item->{Name} = $Item->{Name}    || '';
 
         # print ticket row
         for my $Element (qw(ID Name)) {
@@ -268,10 +268,10 @@ sub _Delete {
         }
 
         my @TicketIDs = $CommonObject{TicketObject}->TicketSearch(
-            Result  => 'ARRAY',
-            Limit   => 100,
+            Result   => 'ARRAY',
+            Limit    => 100,
             QueueIDs => [$ItemID],
-            UserID  => 1,
+            UserID   => 1,
         );
 
         if ( $TicketIDs[0] ) {
@@ -306,7 +306,7 @@ sub _Delete {
         # delete ticket
         my $Success = $CommonObject{DevQueueObject}->QueueDelete(
             QueueID => $ItemID,
-            UserID => 1,
+            UserID  => 1,
         );
 
         if ( !$Success ) {
