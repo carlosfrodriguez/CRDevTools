@@ -11,10 +11,18 @@
         <!--
         <File Permission="644" Location="doc/en/CRDevTools.txt"/>
         -->
-        <File Permission="755" Location="bin/cr.DevTicketDelete.pl"/>
-        <File Permission="755" Location="bin/cr.DevTypeDelete.pl"/>
-        <File Permission="755" Location="bin/cr.DevUserDelete.pl"/>
-        <File Permission="644" Location="Kernel/System/CR/Dev/Type.pm"/>
-        <File Permission="644" Location="Kernel/System/CR/Dev/User.pm"/>
+        <File Permission="755" Location="bin/cr.DevGroupDelete.pl" />
+        <File Permission="755" Location="bin/cr.DevPriorityDelete.pl" />
+        <File Permission="755" Location="bin/cr.DevQueueDelete.pl" />
+        <File Permission="755" Location="bin/cr.DevStateDelete.pl" />
+        <File Permission="755" Location="bin/cr.DevTicketDelete.pl" />
+        <File Permission="755" Location="bin/cr.DevTypeDelete.pl" />
+        <File Permission="644" Location="Kernel/System/CR/Dev/Group.pm" />
+        <File Permission="644" Location="Kernel/System/CR/Dev/Priority.pm" />
+        <File Permission="644" Location="Kernel/System/CR/Dev/Queue.pm" />
+        <File Permission="644" Location="Kernel/System/CR/Dev/State.pm" />
+        <File Permission="755" Location="bin/cr.DevUserDelete.pl" />
+        <File Permission="644" Location="Kernel/System/CR/Dev/Type.pm" />
+        <File Permission="644" Location="Kernel/System/CR/Dev/User.pm" />
     </Filelist>
 </otrs_package>
