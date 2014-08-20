@@ -46,9 +46,23 @@
 
   **Warning:** As many tables are related to **_&lt;User Table&gt;_** before try to delete any user it is necessary to check if is not referenced by any other table.
 
-All tools contains a list and search options.
+All this tools contains a list and search options.
+
+###General Tools:
+
+* cr.DevProcessManagement:
+
+   Import processes without changing the entity ID (raw import).
+
+   Deletes all process Tickets from the DB.
+
+   Deletes all processes from DB.
+
+   Deploy processes.
+
+   Generate tickets for available processes using a random process and a random activity.
 
 ####Note:
-This package is not intended to be use on production systems, please be aware of potensial data lost.
+This package is not intended to be use on production systems, please be aware of potential data lost.
 
 Use it carefully and at your own risk, data deleted by included tools might be unrecoverable!
