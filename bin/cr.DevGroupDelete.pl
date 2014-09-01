@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# bin/cr.DevGroupDelete.pl - Delete Ticket Priorites
+# bin/cr.DevGroupDelete.pl - Delete Ticket Groups
 # This package is intended to work on Development and Testing Environments
 # Copyright (C) 2014 Carlos Rodriguez, https://github.com/carlosfrodriguez
 # --
@@ -43,16 +43,6 @@ local $Kernel::OM = Kernel::System::ObjectManager->new(
         LogPrefix => 'OTRS-cr.DevGroupDelete.pl',
     },
 );
-my %CommonObject = $Kernel::OM->ObjectHash(
-    Objects => [
-        qw(
-            ConfigObject EncodeObject LogObject MainObject DBObject TimeObject TicketObject
-            GroupObject
-            )
-    ],
-);
-
-$CommonObject{DevGroupObject} = Kernel::System::CR::Dev::Group->new(%CommonObject);
 
 # get options
 my %Opts = ();
@@ -122,7 +112,7 @@ else {
 sub _List {
 
     # search all tickets
-    my %List = $CommonObject{GroupObject}->GroupList(
+    my %List = $Kernel::OM->Get('Kernel::System::Group')->GroupList(
         Valid  => 0,
         UserID => 1,
     );
@@ -137,7 +127,7 @@ sub _Search {
     my %SearchOptions = %{ $Param{SearchOptions} };
 
     # search all users
-    my %List = $CommonObject{DevGroupObject}->GroupSearch(
+    my %List = $Kernel::OM->Get('Kernel::System::CR::Dev::Group')->GroupSearch(
         %SearchOptions,
         Valid => 0,
     );
@@ -154,13 +144,16 @@ sub _Output {
     # to store all item details
     my @Items;
 
+    # get group object
+    my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
+
     ITEM:
     for my $ItemID (@ItemIDs) {
 
         next ITEM if !$ItemID;
 
         # get item details
-        my %Item = $CommonObject{GroupObject}->GroupGet(
+        my %Item = $GroupObject->GroupGet(
             ID     => $ItemID,
             UserID => 1,
         );
@@ -248,13 +241,16 @@ sub _Delete {
     # to store exit value
     my $Failed;
 
+    # get group object
+    my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
+
     ITEMID:
     for my $ItemID (@ItemsToDelete) {
 
         next ITEMID if !$ItemID;
 
         # get item details
-        my %Item = $CommonObject{GroupObject}->GroupGet(
+        my %Item = $GroupObject->GroupGet(
             ID     => $ItemID,
             UserID => 1,
         );
@@ -267,14 +263,17 @@ sub _Delete {
         }
 
         # delete ticket
-        my $Success = $CommonObject{DevGroupObject}->GroupDelete(
+        my $Success = $Kernel::OM->Get('Kernel::System::CR::Dev::Group')->GroupDelete(
             GroupID => $ItemID,
             UserID  => 1,
         );
 
         if ( !$Success ) {
-            print "Can't delete Group $ItemID\n";
+            print "--Can't delete Group $ItemID\n";
             $Failed = 1;
+        }
+        else {
+            print "Deleted group $ItemID\n"
         }
     }
     return $Failed;

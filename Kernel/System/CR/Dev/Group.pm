@@ -14,6 +14,12 @@ use warnings;
 
 use Kernel::System::VariableCheck qw(:all);
 
+our @ObjectDependencies = (
+    'Kernel::System::DB',
+    'Kernel::System::Group',
+    'Kernel::System::log',
+);
+
 =head1 NAME
 
 Kernel::System::CR::Dev::Group - Ticket Group Dev lib
@@ -30,47 +36,11 @@ All Ticket Group Development functions.
 
 =item new()
 
-create an object
+create an object. Do not use it directly, instead use:
 
-    use Kernel::Config;
-    use Kernel::System::Encode;
-    use Kernel::System::Log;
-    use Kernel::System::Time;
-    use Kernel::System::Main;
-    use Kernel::System::DB;
-    use Kernel::System::CR::Dev::Group;
-
-    my $ConfigObject = Kernel::Config->new();
-    my $EncodeObject = Kernel::System::Encode->new(
-        ConfigObject => $ConfigObject,
-    );
-    my $LogObject = Kernel::System::Log->new(
-        ConfigObject => $ConfigObject,
-        EncodeObject => $EncodeObject,
-    );
-    my $TimeObject = Kernel::System::Time->new(
-        ConfigObject => $ConfigObject,
-        LogObject    => $LogObject,
-    );
-    my $MainObject = Kernel::System::Main->new(
-        ConfigObject => $ConfigObject,
-        EncodeObject => $EncodeObject,
-        LogObject    => $LogObject,
-    );
-    my $DBObject = Kernel::System::DB->new(
-        ConfigObject => $ConfigObject,
-        EncodeObject => $EncodeObject,
-        LogObject    => $LogObject,
-        MainObject   => $MainObject,
-    );
-    my $DevGroupObject = Kernel::System::CR::Dev::Group->new(
-        ConfigObject       => $ConfigObject,
-        LogObject          => $LogObject,
-        DBObject           => $DBObject,
-        MainObject         => $MainObject,
-        TimeObject         => $TimeObject,
-        EncodeObject       => $EncodeObject,
-    );
+    use Kernel::System::ObjectManager;
+    local $Kernel::OM = Kernel::System::ObjectManager->new();
+    my $ValidObject = $Kernel::OM->Get('Kernel::System::CR::Dev::Group');
 
 =cut
 
@@ -84,24 +54,9 @@ sub new {
     # 0=off; 1=on;
     $Self->{Debug} = $Param{Debug} || 0;
 
-    # get needed objects
-    for my $Needed (
-        qw(
-        ConfigObject LogObject TimeObject DBObject MainObject EncodeObject GroupObject
-        )
-        )
-    {
-        if ( $Param{$Needed} ) {
-            $Self->{$Needed} = $Param{$Needed};
-        }
-        else {
-            die "Got no $Needed!";
-        }
-    }
-
     # set lower if database is case sensitive
     $Self->{Lower} = '';
-    if ( $Self->{DBObject}->GetDatabaseFunction('CaseSensitive') ) {
+    if ( $Kernel::OM->Get('Kernel::System::DB')->GetDatabaseFunction('CaseSensitive') ) {
         $Self->{Lower} = 'LOWER';
     }
 
@@ -113,7 +68,7 @@ sub new {
 Deletes a ticket Group from DB
 
     my $Success = $DevGroupObject->GroupDelete(
-        GroupID => 123,                      # GroupID or Group is requiered
+        GroupID => 123,                      # GroupID or Group is required
         Group   => 'Some Group',
     );
 
@@ -127,30 +82,36 @@ sub GroupDelete {
 
     # check needed stuff
     if ( !$Param{Group} && !$Param{GroupID} ) {
-        $Self->{LogObject}->Log(
+        $Kernel::OM->Get('Kernel::System::log')->Log(
             Group   => 'error',
             Message => 'Need User or UserID!'
         );
         return;
     }
 
+    # get group object
+    my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
+
     # set GroupID
     my $GroupID = $Param{GroupID} || '';
     if ( !$GroupID ) {
-        my $GroupID = $Self->{GroupObject}->GroupLookup(
+        my $GroupID = $GroupObject->GroupLookup(
             Group => $Param{Group},
         );
     }
     if ( !$GroupID ) {
-        $Self->{LogObject}->Log(
+        $Kernel::OM->Get('Kernel::System::log')->Log(
             Group   => 'error',
             Message => 'Group is invalid!'
         );
         return;
     }
 
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
     # delete Group User relations
-    return if !$Self->{DBObject}->Do(
+    return if !$DBObject->Do(
         SQL => "
             DELETE FROM group_user
             WHERE group_id = ?",
@@ -159,7 +120,7 @@ sub GroupDelete {
     );
 
     # delete Group Role relations
-    return if !$Self->{DBObject}->Do(
+    return if !$DBObject->Do(
         SQL => "
             DELETE FROM group_role
             WHERE group_id = ?",
@@ -168,7 +129,7 @@ sub GroupDelete {
     );
 
     # delete Group from DB
-    return if !$Self->{DBObject}->Do(
+    return if !$DBObject->Do(
         SQL => "
             DELETE FROM groups
             WHERE id = ?",
@@ -177,7 +138,7 @@ sub GroupDelete {
     );
 
     # delete cache
-    $Self->{GroupObject}->{CacheInternalObject}->CleanUp();
+    $GroupObject->{CacheInternalObject}->CleanUp();
 
     return 1;
 }
@@ -201,15 +162,18 @@ sub GroupSearch {
 
     # check needed stuff
     if ( !$Param{Name} ) {
-        $Self->{LogObject}->Log(
+        $Kernel::OM->Get('Kernel::System::log')->Log(
             Group   => 'error',
             Message => 'Need Name!',
         );
         return;
     }
 
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
     # get like escape string needed for some databases (e.g. oracle)
-    my $LikeEscapeString = $Self->{DBObject}->GetDatabaseFunction('LikeEscapeString');
+    my $LikeEscapeString = $DBObject->GetDatabaseFunction('LikeEscapeString');
 
     # build SQL string 1/2
     my $SQL = '
@@ -220,7 +184,7 @@ sub GroupSearch {
     # build SQL string 2/2
     $Param{Name} =~ s/\*/%/g;
     $SQL .= ' name LIKE '
-        . "'" . $Self->{DBObject}->Quote( $Param{Name}, 'Like' ) . "'"
+        . "'" . $DBObject->Quote( $Param{Name}, 'Like' ) . "'"
         . "$LikeEscapeString";
 
     # add valid option
@@ -229,13 +193,13 @@ sub GroupSearch {
     }
 
     # get data
-    return if !$Self->{DBObject}->Prepare(
+    return if !$DBObject->Prepare(
         SQL   => $SQL,
         Limit => $Param{Limit},
     );
 
     # fetch the result
-    while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
+    while ( my @Row = $DBObject->FetchrowArray() ) {
         $Groups{ $Row[0] } = $Row[1];
     }
 
