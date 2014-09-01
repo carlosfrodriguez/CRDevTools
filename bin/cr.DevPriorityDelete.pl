@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# bin/cr.DevPriorityDelete.pl - Delete Ticket Priorites
+# bin/cr.DevPriorityDelete.pl - Delete Ticket Priorities
 # This package is intended to work on Development and Testing Environments
 # Copyright (C) 2014 Carlos Rodriguez, https://github.com/carlosfrodriguez
 # --
@@ -43,16 +43,6 @@ local $Kernel::OM = Kernel::System::ObjectManager->new(
         LogPrefix => 'OTRS-cr.DevPriorityDelete.pl',
     },
 );
-my %CommonObject = $Kernel::OM->ObjectHash(
-    Objects => [
-        qw(
-            ConfigObject EncodeObject LogObject MainObject DBObject TimeObject TicketObject
-            PriorityObject
-            )
-    ],
-);
-
-$CommonObject{DevPriorityObject} = Kernel::System::CR::Dev::Priority->new(%CommonObject);
 
 # get options
 my %Opts = ();
@@ -126,7 +116,7 @@ else {
 sub _List {
 
     # search all tickets
-    my %List = $CommonObject{PriorityObject}->PriorityList(
+    my %List = $Kernel::OM->Get('Kernel::System::Priority')->PriorityList(
         Valid  => 0,
         UserID => 1,
     );
@@ -141,7 +131,7 @@ sub _Search {
     my %SearchOptions = %{ $Param{SearchOptions} };
 
     # search all users
-    my %List = $CommonObject{DevPriorityObject}->PrioritySearch(
+    my %List = $Kernel::OM->Get('Kernel::System::CR::Dev::Priority')->PrioritySearch(
         %SearchOptions,
         Valid => 0,
     );
@@ -164,7 +154,7 @@ sub _Output {
         next ITEM if !$ItemID;
 
         # get item details
-        my %Item = $CommonObject{PriorityObject}->PriorityGet(
+        my %Item = $Kernel::OM->Get('Kernel::System::Priority')->PriorityGet(
             PriorityID => $ItemID,
             UserID     => 1,
         );
@@ -252,13 +242,16 @@ sub _Delete {
     # to store exit value
     my $Failed;
 
+    # get ticket object
+    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+
     ITEMID:
     for my $ItemID (@ItemsToDelete) {
 
         next ITEMID if !$ItemID;
 
         # get item details
-        my %Item = $CommonObject{PriorityObject}->PriorityGet(
+        my %Item = $Kernel::OM->Get('Kernel::System::Priority')->PriorityGet(
             PriorityID => $ItemID,
             UserID     => 1,
         );
@@ -270,7 +263,7 @@ sub _Delete {
             next ITEMID;
         }
 
-        my @TicketIDs = $CommonObject{TicketObject}->TicketSearch(
+        my @TicketIDs = $TicketObject->TicketSearch(
             Result      => 'ARRAY',
             Limit       => 100,
             PriorityIDs => [$ItemID],
@@ -282,7 +275,7 @@ sub _Delete {
                 for my $TicketID (@TicketIDs) {
 
                     # delete ticket
-                    my $Success = $CommonObject{TicketObject}->TicketDelete(
+                    my $Success = $TicketObject->TicketDelete(
                         TicketID => $TicketID,
                         UserID   => 1,
                     );
@@ -307,14 +300,17 @@ sub _Delete {
         }
 
         # delete ticket
-        my $Success = $CommonObject{DevPriorityObject}->PriorityDelete(
+        my $Success = $Kernel::OM->Get('Kernel::System::CR::Dev::Priority')->PriorityDelete(
             PriorityID => $ItemID,
             UserID     => 1,
         );
 
         if ( !$Success ) {
-            print "Can't delete Priority $ItemID\n";
+            print "--Can't delete Priority $ItemID\n";
             $Failed = 1;
+        }
+        else {
+            print "Deleted Priority $ItemID\n";
         }
     }
     return $Failed;
