@@ -43,16 +43,6 @@ local $Kernel::OM = Kernel::System::ObjectManager->new(
         LogPrefix => 'OTRS-cr.DevStateDelete.pl',
     },
 );
-my %CommonObject = $Kernel::OM->ObjectHash(
-    Objects => [
-        qw(
-            ConfigObject EncodeObject LogObject MainObject DBObject TimeObject TicketObject
-            StateObject
-            )
-    ],
-);
-
-$CommonObject{DevStateObject} = Kernel::System::CR::Dev::State->new(%CommonObject);
 
 # get options
 my %Opts = ();
@@ -126,7 +116,7 @@ else {
 sub _List {
 
     # search all tickets
-    my %List = $CommonObject{StateObject}->StateList(
+    my %List = $Kernel::OM->Get('Kernel::System::State')->StateList(
         Valid  => 0,
         UserID => 1,
     );
@@ -141,7 +131,7 @@ sub _Search {
     my %SearchOptions = %{ $Param{SearchOptions} };
 
     # search all users
-    my %List = $CommonObject{DevStateObject}->StateSearch(
+    my %List = $Kernel::OM->Get('Kernel::System::CR::Dev::State')->StateSearch(
         %SearchOptions,
         Valid => 0,
     );
@@ -158,13 +148,16 @@ sub _Output {
     # to store all item details
     my @Items;
 
+    # get state object
+    my $StateObject = $Kernel::OM->Get('Kernel::System::State');
+
     ITEM:
     for my $ItemID (@ItemIDs) {
 
         next ITEM if !$ItemID;
 
         # get item details
-        my %Item = $CommonObject{StateObject}->StateGet(
+        my %Item = $StateObject->StateGet(
             ID => $ItemID,
         );
         next ITEM if !%Item;
@@ -251,13 +244,19 @@ sub _Delete {
     # to store exit value
     my $Failed;
 
+    # get ticket object
+    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
+
+    # get state object
+    my $StateObject = $Kernel::OM->Get('Kernel::System::State');
+
     ITEMID:
     for my $ItemID (@ItemsToDelete) {
 
         next ITEMID if !$ItemID;
 
         # get item details
-        my %Item = $CommonObject{StateObject}->StateGet(
+        my %Item = $StateObject->StateGet(
             ID => $ItemID,
         );
 
@@ -268,7 +267,7 @@ sub _Delete {
             next ITEMID;
         }
 
-        my @TicketIDs = $CommonObject{TicketObject}->TicketSearch(
+        my @TicketIDs = $TicketObject->TicketSearch(
             Result   => 'ARRAY',
             Limit    => 100,
             StateIDs => [$ItemID],
@@ -280,7 +279,7 @@ sub _Delete {
                 for my $TicketID (@TicketIDs) {
 
                     # delete ticket
-                    my $Success = $CommonObject{TicketObject}->TicketDelete(
+                    my $Success = $TicketObject->TicketDelete(
                         TicketID => $TicketID,
                         UserID   => 1,
                     );
@@ -305,14 +304,17 @@ sub _Delete {
         }
 
         # delete ticket
-        my $Success = $CommonObject{DevStateObject}->StateDelete(
+        my $Success = $Kernel::OM->Get('Kernel::System::CR::Dev::State')->StateDelete(
             StateID => $ItemID,
             UserID  => 1,
         );
 
         if ( !$Success ) {
-            print "Can't delete State $ItemID\n";
+            print "--Can't delete State $ItemID\n";
             $Failed = 1;
+        }
+        else {
+            print "Deleted State $ItemID\n";
         }
     }
     return $Failed;
