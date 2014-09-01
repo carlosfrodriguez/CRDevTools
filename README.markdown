@@ -42,7 +42,7 @@
 
 * cr.DevUserDelete:
 
-  Delete users from DB, also removes relations from _group_user_, _role_user_ and **_&lt;User Preferences Table&gt;_**
+  Delete users from DB, also removes relations from _group_user_, _role_user_, _article_fag_, _ticket_history_ and **_&lt;User Preferences Table&gt;_**
 
   **Warning:** As many tables are related to **_&lt;User Table&gt;_** before try to delete any user it is necessary to check if is not referenced by any other table.
 
