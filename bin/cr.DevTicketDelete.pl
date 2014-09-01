@@ -42,18 +42,23 @@ local $Kernel::OM = Kernel::System::ObjectManager->new(
         LogPrefix => 'OTRS-otrs.DevDeleteTicket.pl',
     },
 );
-my %CommonObject = $Kernel::OM->ObjectHash(
-    Objects => [
-        qw(
-            ConfigObject EncodeObject LogObject MainObject DBObject TimeObject TicketObject
-            UserObject
-            )
-    ],
-);
+
+# my %CommonObject = $Kernel::OM->ObjectHash(
+#     Objects => [
+#         qw(
+#             ConfigObject EncodeObject LogObject MainObject DBObject TimeObject TicketObject
+#             UserObject
+#             )
+#     ],
+# );
+
+my %CommonObject;
+$CommonObject{TicketObject} = $Kernel::OM->Get('Kernel::System::Ticket');
+$CommonObject{UserObject}   = $Kernel::OM->Get('Kernel::System::User');
 
 # get options
 my %Opts = ();
-getopt( 'haixnoctf', \%Opts );
+getopt( 'haixnoctfr', \%Opts );
 
 if ( $Opts{h} ) {
     _Help();
@@ -84,7 +89,7 @@ elsif ( $Opts{a} && $Opts{a} eq 'delete' ) {
 
         # check if ID is numeric valid
         if ( $Opts{r} !~ m{\A(\d+)\.\.(\d+)\z} ) {
-            print "The UserID $Opts{r} is invalid!\n";
+            print "The TicketID $Opts{r} is invalid!\n";
             _Help();
             exit 0;
         }
@@ -366,8 +371,11 @@ sub _Delete {
         );
 
         if ( !$Success ) {
-            print "Can't delete ticket $TicketID\n";
+            print "--Can't delete ticket $TicketID\n";
             $Failed = 1;
+        }
+        else {
+            print "Deleted ticket $TicketID\n"
         }
     }
     return $Failed;
@@ -388,7 +396,7 @@ Options:
     -a search -f *Text*           # full text search on fields To, From Cs Subject and Body (wild cards are allowed)
 
     -a delete -i 123              # deletes the ticket with ID 123
-    -1 delete -1 5..10            # deletes the tickets with IDs 5 to 10
+    -a delete -r 5..10            # deletes the tickets with IDs 5 to 10
     -a delete -x 1                # deletes all tickets in the system except otrs welcome ticket
     -a delete -x 2                # deletes all tickets in the system including otrs welcome ticket
 
