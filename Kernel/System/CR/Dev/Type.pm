@@ -14,6 +14,13 @@ use warnings;
 
 use Kernel::System::VariableCheck qw(:all);
 
+our @ObjectDependencies = (
+    'Kernel::System::Cache',
+    'Kernel::System::DB',
+    'Kernel::System::Log',
+    'Kernel::System::Type',
+);
+
 =head1 NAME
 
 Kernel::System::CR::Dev::Type - Ticket Type Dev lib
@@ -30,47 +37,11 @@ All Ticket Type Development functions.
 
 =item new()
 
-create an object
+create an object. Do not use it directly, instead use:
 
-    use Kernel::Config;
-    use Kernel::System::Encode;
-    use Kernel::System::Log;
-    use Kernel::System::Time;
-    use Kernel::System::Main;
-    use Kernel::System::DB;
-    use Kernel::System::CR::Dev::Type;
-
-    my $ConfigObject = Kernel::Config->new();
-    my $EncodeObject = Kernel::System::Encode->new(
-        ConfigObject => $ConfigObject,
-    );
-    my $LogObject = Kernel::System::Log->new(
-        ConfigObject => $ConfigObject,
-        EncodeObject => $EncodeObject,
-    );
-    my $TimeObject = Kernel::System::Time->new(
-        ConfigObject => $ConfigObject,
-        LogObject    => $LogObject,
-    );
-    my $MainObject = Kernel::System::Main->new(
-        ConfigObject => $ConfigObject,
-        EncodeObject => $EncodeObject,
-        LogObject    => $LogObject,
-    );
-    my $DBObject = Kernel::System::DB->new(
-        ConfigObject => $ConfigObject,
-        EncodeObject => $EncodeObject,
-        LogObject    => $LogObject,
-        MainObject   => $MainObject,
-    );
-    my $DevTypeObject = Kernel::System::CR::Dev::Type->new(
-        ConfigObject       => $ConfigObject,
-        LogObject          => $LogObject,
-        DBObject           => $DBObject,
-        MainObject         => $MainObject,
-        TimeObject         => $TimeObject,
-        EncodeObject       => $EncodeObject,
-    );
+    use Kernel::System::ObjectManager;
+    local $Kernel::OM = Kernel::System::ObjectManager->new();
+    my $ValidObject = $Kernel::OM->Get('Kernel::System::CR::Dev::Type');
 
 =cut
 
@@ -84,24 +55,9 @@ sub new {
     # 0=off; 1=on;
     $Self->{Debug} = $Param{Debug} || 0;
 
-    # get needed objects
-    for my $Needed (
-        qw(
-        ConfigObject LogObject TimeObject DBObject MainObject EncodeObject TypeObject
-        )
-        )
-    {
-        if ( $Param{$Needed} ) {
-            $Self->{$Needed} = $Param{$Needed};
-        }
-        else {
-            die "Got no $Needed!";
-        }
-    }
-
     # set lower if database is case sensitive
     $Self->{Lower} = '';
-    if ( $Self->{DBObject}->GetDatabaseFunction('CaseSensitive') ) {
+    if ( $Kernel::OM->Get('Kernel::System::DB')->GetDatabaseFunction('CaseSensitive') ) {
         $Self->{Lower} = 'LOWER';
     }
 
@@ -127,7 +83,7 @@ sub TypeDelete {
 
     # check needed stuff
     if ( !$Param{Type} && !$Param{TypeID} ) {
-        $Self->{LogObject}->Log(
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message  => 'Need User or UserID!'
         );
@@ -137,12 +93,12 @@ sub TypeDelete {
     # set TypeID
     my $TypeID = $Param{TypeID} || '';
     if ( !$TypeID ) {
-        my $TypeID = $Self->{TypeObject}->TypeLookup(
+        my $TypeID = $Kernel::OM->Get('Kernel::System::Type')->TypeLookup(
             Type => $Param{Type},
         );
     }
     if ( !$TypeID ) {
-        $Self->{LogObject}->Log(
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message  => 'Type is invalid!'
         );
@@ -150,7 +106,7 @@ sub TypeDelete {
     }
 
     # delete type from DB
-    return if !$Self->{DBObject}->Do(
+    return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
         SQL => "
             DELETE FROM ticket_type
             WHERE id = ?",
@@ -159,8 +115,9 @@ sub TypeDelete {
     );
 
     # delete cache
-    $Self->{TypeObject}->{CacheInternalObject}->CleanUp();
-
+    $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
+        Type => 'Type',
+    );
     return 1;
 }
 
@@ -183,15 +140,18 @@ sub TypeSearch {
 
     # check needed stuff
     if ( !$Param{Name} ) {
-        $Self->{LogObject}->Log(
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message  => 'Need Name!',
         );
         return;
     }
 
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
     # get like escape string needed for some databases (e.g. oracle)
-    my $LikeEscapeString = $Self->{DBObject}->GetDatabaseFunction('LikeEscapeString');
+    my $LikeEscapeString = $DBObject->GetDatabaseFunction('LikeEscapeString');
 
     # build SQL string 1/2
     my $SQL = '
@@ -202,7 +162,7 @@ sub TypeSearch {
     # build SQL string 2/2
     $Param{Name} =~ s/\*/%/g;
     $SQL .= ' name LIKE '
-        . "'" . $Self->{DBObject}->Quote( $Param{Name}, 'Like' ) . "'"
+        . "'" . $DBObject->Quote( $Param{Name}, 'Like' ) . "'"
         . "$LikeEscapeString";
 
     # add valid option
@@ -211,13 +171,13 @@ sub TypeSearch {
     }
 
     # get data
-    return if !$Self->{DBObject}->Prepare(
+    return if !$DBObject->Prepare(
         SQL => $SQL,
         Limit => $Self->{UserSearchListLimit} || $Param{Limit},
     );
 
     # fetch the result
-    while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
+    while ( my @Row = $DBObject->FetchrowArray() ) {
         $Types{ $Row[0] } = $Row[1];
     }
 
