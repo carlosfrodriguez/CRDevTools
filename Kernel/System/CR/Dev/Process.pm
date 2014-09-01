@@ -30,6 +30,30 @@ our @ObjectDependencies = (
     'Kernel::System::YAML',
 );
 
+=head1 NAME
+
+Kernel::System::CR::Dev::Process - Process Dev lib
+
+=head1 SYNOPSIS
+
+All Process Development functions.
+
+=head1 PUBLIC INTERFACE
+
+=over 4
+
+=cut
+
+=item new()
+
+create an object. Do not use it directly, instead use:
+
+    use Kernel::System::ObjectManager;
+    local $Kernel::OM = Kernel::System::ObjectManager->new();
+    my $ValidObject = $Kernel::OM->Get('Kernel::System::CR::Dev::Process');
+
+=cut
+
 sub new {
     my ( $Type, %Param ) = @_;
 
@@ -573,3 +597,15 @@ sub ProcessDeploy {
 }
 
 1;
+
+=back
+
+=head1 TERMS AND CONDITIONS
+
+This software is part of the CRDevTools project (L<https://github.com/carlosfrodriguez/CRDevTools/>).
+
+This software comes with ABSOLUTELY NO WARRANTY. For details, see
+the enclosed file COPYING for license information (AGPL). If you
+did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
+
+=cut
