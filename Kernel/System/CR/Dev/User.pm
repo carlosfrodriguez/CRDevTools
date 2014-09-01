@@ -14,6 +14,13 @@ use warnings;
 
 use Kernel::System::VariableCheck qw(:all);
 
+our @ObjectDependencies = (
+    'Kernel::Config',
+    'Kernel::System::Cache',
+    'Kernel::System::DB',
+    'Kernel::System::Log',
+);
+
 =head1 NAME
 
 Kernel::System::CR::Dev::User - User Dev lib
@@ -30,48 +37,11 @@ All User Development functions.
 
 =item new()
 
-create an object
+create an object. Do not use it directly, instead use:
 
-    use Kernel::Config;
-    use Kernel::System::Encode;
-    use Kernel::System::Log;
-    use Kernel::System::Time;
-    use Kernel::System::Main;
-    use Kernel::System::DB;
-    use Kernel::System::CR::Dev::User;
-
-    my $ConfigObject = Kernel::Config->new();
-    my $EncodeObject = Kernel::System::Encode->new(
-        ConfigObject => $ConfigObject,
-    );
-    my $LogObject = Kernel::System::Log->new(
-        ConfigObject => $ConfigObject,
-        EncodeObject => $EncodeObject,
-    );
-    my $TimeObject = Kernel::System::Time->new(
-        ConfigObject => $ConfigObject,
-        LogObject    => $LogObject,
-    );
-    my $MainObject = Kernel::System::Main->new(
-        ConfigObject => $ConfigObject,
-        EncodeObject => $EncodeObject,
-        LogObject    => $LogObject,
-    );
-    my $DBObject = Kernel::System::DB->new(
-        ConfigObject => $ConfigObject,
-        EncodeObject => $EncodeObject,
-        LogObject    => $LogObject,
-        MainObject   => $MainObject,
-    );
-    my $DevUserObject = Kernel::System::CR::Dev::User->new(
-        ConfigObject       => $ConfigObject,
-        LogObject          => $LogObject,
-        DBObject           => $DBObject,
-        MainObject         => $MainObject,
-        TimeObject         => $TimeObject,
-        EncodeObject       => $EncodeObject,
-        GroupObject        => $GroupObject,
-    );
+    use Kernel::System::ObjectManager;
+    local $Kernel::OM = Kernel::System::ObjectManager->new();
+    my $ValidObject = $Kernel::OM->Get('Kernel::System::CR::Dev::User');
 
 =cut
 
@@ -85,25 +55,9 @@ sub new {
     # 0=off; 1=on;
     $Self->{Debug} = $Param{Debug} || 0;
 
-    # get needed objects
-    for my $Needed (
-        qw(
-        ConfigObject LogObject TimeObject DBObject MainObject EncodeObject UserObject
-        GroupObject
-        )
-        )
-    {
-        if ( $Param{$Needed} ) {
-            $Self->{$Needed} = $Param{$Needed};
-        }
-        else {
-            die "Got no $Needed!";
-        }
-    }
-
     # set lower if database is case sensitive
     $Self->{Lower} = '';
-    if ( $Self->{DBObject}->GetDatabaseFunction('CaseSensitive') ) {
+    if ( $Kernel::OM->Get('Kernel::System::DB')->GetDatabaseFunction('CaseSensitive') ) {
         $Self->{Lower} = 'LOWER';
     }
 
@@ -130,7 +84,7 @@ sub UserDelete {
 
     # check needed stuff
     if ( !$Param{User} && !$Param{UserID} ) {
-        $Self->{LogObject}->Log(
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message  => 'Need User or UserID!'
         );
@@ -140,24 +94,30 @@ sub UserDelete {
     # set UserID
     my $UserID = $Param{UserID} || '';
     if ( !$UserID ) {
-        my $UserID = $Self->{UserObject}->UserLookup(
+        my $UserID = $Kernel::OM->Get('Kernel::System::DB')->UserLookup(
             User => $Param{User},
         );
     }
     if ( !$UserID ) {
-        $Self->{LogObject}->Log(
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message  => 'User is invalid!'
         );
         return;
     }
 
+    # get config object
+    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+
     # preferences table data
-    my $PreferencesTable = $Self->{ConfigObject}->Get('PreferencesTable') || 'user_preferences';
-    my $PreferencesTableUserID = $Self->{ConfigObject}->Get('PreferencesTableUserID') || 'user_id';
+    my $PreferencesTable       = $ConfigObject->Get('PreferencesTable')       || 'user_preferences';
+    my $PreferencesTableUserID = $ConfigObject->Get('PreferencesTableUserID') || 'user_id';
+
+    # get database object
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
 
     # delete from preferences
-    return if !$Self->{DBObject}->Do(
+    return if !$DBObject->Do(
         SQL => "
             DELETE FROM $PreferencesTable
             WHERE $PreferencesTableUserID = ?",
@@ -165,7 +125,7 @@ sub UserDelete {
     );
 
     # delete existing group user relation
-    return if !$Self->{DBObject}->Do(
+    return if !$DBObject->Do(
         SQL => '
             DELETE FROM group_user
             WHERE user_id = ?',
@@ -173,20 +133,37 @@ sub UserDelete {
     );
 
     # delete existing role user relation
-    return if !$Self->{DBObject}->Do(
+    return if !$DBObject->Do(
         SQL => '
             DELETE FROM role_user
             WHERE user_id = ?',
         Bind => [ \$Param{UserID}, ],
     );
 
+    # delete existing article_flag user relation
+    return if !$DBObject->Do(
+        SQL => '
+            DELETE FROM article_flag
+            WHERE create_by = ?',
+        Bind => [ \$Param{UserID}, ],
+    );
+
+    # delete existing ticket_history user relation
+    return if !$DBObject->Do(
+        SQL => '
+            DELETE FROM article_flag
+            WHERE owner_id = ?
+            OR create_by = ?',
+        Bind => [ \$Param{UserID}, \$Param{UserID} ],
+    );
+
     # get user table
-    my $UserTable       = $Self->{ConfigObject}->Get('DatabaseUserTable')       || 'user';
-    my $UserTableUserID = $Self->{ConfigObject}->Get('DatabaseUserTableUserID') || 'id';
-    my $UserTableUser   = $Self->{ConfigObject}->Get('DatabaseUserTableUser')   || 'login';
+    my $UserTable       = $ConfigObject->Get('DatabaseUserTable')       || 'user';
+    my $UserTableUserID = $ConfigObject->Get('DatabaseUserTableUserID') || 'id';
+    my $UserTableUser   = $ConfigObject->Get('DatabaseUserTableUser')   || 'login';
 
     # delete user from DB
-    return if !$Self->{DBObject}->Do(
+    return if !$DBObject->Do(
         SQL => "
             DELETE FROM $UserTable
             WHERE $UserTableUserID = ?",
@@ -195,8 +172,13 @@ sub UserDelete {
     );
 
     # delete cache
-    $Self->{UserObject}->{CacheInternalObject}->CleanUp();
-    $Self->{GroupObject}->{CacheInternalObject}->CleanUp();
+    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    $CacheObject->CleanUp(
+        Type => 'User',
+    );
+    $CacheObject->CleanUp(
+        Type => 'Group',
+    );
 
     return 1;
 }

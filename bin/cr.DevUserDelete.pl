@@ -43,16 +43,6 @@ local $Kernel::OM = Kernel::System::ObjectManager->new(
         LogPrefix => 'OTRS-cr.DevUserDelete.pl',
     },
 );
-my %CommonObject = $Kernel::OM->ObjectHash(
-    Objects => [
-        qw(
-            ConfigObject EncodeObject LogObject MainObject DBObject TimeObject TicketObject
-            UserObject
-            )
-    ],
-);
-
-$CommonObject{DevUserObject} = Kernel::System::CR::Dev::User->new(%CommonObject);
 
 # get options
 my %Opts = ();
@@ -128,7 +118,7 @@ else {
 sub _List {
 
     # search all users
-    my %List = $CommonObject{UserObject}->UserList(
+    my %List = $Kernel::OM->Get('Kernel::System::User')->UserList(
         Type  => 'short',
         Valid => 0,
     );
@@ -143,7 +133,7 @@ sub _Search {
     my %SearchOptions = %{ $Param{SearchOptions} };
 
     # search all users
-    my %List = $CommonObject{UserObject}->UserSearch(
+    my %List = $Kernel::OM->Get('Kernel::System::User')->UserSearch(
         %SearchOptions,
         Valid => 0,
     );
@@ -160,13 +150,16 @@ sub _Output {
     # to store all user details
     my @Users;
 
+    # get user object
+    my $UserObject = $Kernel::OM->Get('Kernel::System::User');
+
     USER:
     for my $UserID (@UserIDs) {
 
         next USER if !$UserID;
 
         # get user details
-        my %User = $CommonObject{UserObject}->GetUserData(
+        my %User = $UserObject->GetUserData(
             UserID => $UserID,
         );
         next USER if !%User;
@@ -259,13 +252,18 @@ sub _Delete {
     # to store exit value
     my $Failed;
 
+    # get needed objects
+    my $UserObject = $Kernel::OM->Get('Kernel::System::User');
+
+    my $DevUserObject = $Kernel::OM->Get('Kernel::System::CR::Dev::User');
+
     USERID:
     for my $UserID (@UsersToDelete) {
 
         next USERID if !$UserID;
 
         # get user details
-        my %User = $CommonObject{UserObject}->GetUserData(
+        my %User = $UserObject->GetUserData(
             UserID => $UserID,
         );
 
@@ -277,13 +275,16 @@ sub _Delete {
         }
 
         # delete user
-        my $Success = $CommonObject{DevUserObject}->UserDelete(
+        my $Success = $DevUserObject->UserDelete(
             UserID => $UserID,
         );
 
         if ( !$Success ) {
-            print "Can't delete user $UserID\n";
+            print "--Can't delete user $UserID\n";
             $Failed = 1;
+        }
+        else {
+            print "Deleted User $UserID\n"
         }
     }
     return $Failed;
