@@ -2,7 +2,7 @@
 <otrs_package version="1.0">
     <Name>CRDevTools</Name>
     <Version>0.1.1</Version>
-    <Framework>3.4.x</Framework>
+    <Framework>4.0.x</Framework>
     <Vendor>Carlos Rodriguez</Vendor>
     <URL>http://https://github.com/carlosfrodriguez</URL>
     <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
