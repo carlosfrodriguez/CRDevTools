@@ -58,13 +58,10 @@ $CommonObject{UserObject}   = $Kernel::OM->Get('Kernel::System::User');
 
 # get options
 my %Opts = ();
-getopt( 'haixnoctfr', \%Opts );
+getopt( 'haixr', \%Opts );
 
 if ( $Opts{h} ) {
     _Help();
-}
-elsif ( $Opts{a} && $Opts{a} eq 'list' ) {
-    _List();
 }
 elsif ( $Opts{a} && $Opts{a} eq 'delete' ) {
 
@@ -127,175 +124,13 @@ elsif ( $Opts{a} && $Opts{a} eq 'delete' ) {
         exit 0;
     }
 }
-elsif ( $Opts{a} && $Opts{a} eq 'search' ) {
 
-    my %SearchOptions;
-
-    # ticket number search
-    if ( $Opts{n} ) {
-        $SearchOptions{TicketNumber} = $Opts{n};
-    }
-
-    # owner ID search
-    if ( $Opts{o} ) {
-
-        # search by owner needs to have a valid user, do a user lookup and retreive the UserID
-        my $UserID = $CommonObject{UserObject}->UserLookup( UserLogin => $Opts{o} );
-        if ( !$UserID ) {
-            print "The user $Opts{o} does not exist in the database!\n";
-            exit 1;
-        }
-
-        $SearchOptions{OwnerIDs} = [$UserID];
-    }
-
-    # customer search
-    if ( $Opts{c} ) {
-        $SearchOptions{CustomerUserLogin} = $Opts{c};
-    }
-
-    # title search
-    if ( $Opts{t} ) {
-        $SearchOptions{Title} = $Opts{t};
-    }
-
-    # full text search on From To Cc Subject Body
-    if ( $Opts{f} ) {
-        for my $TicketElement (qw(From To Cc Subject Body)) {
-            $SearchOptions{$TicketElement} = $Opts{f};
-        }
-    }
-
-    _Search( SearchOptions => \%SearchOptions );
-
-}
 else {
     _Help();
     exit 1;
 }
 
 # Internal
-
-sub _List {
-
-    # search all tickets
-    my @TicketIDs = $CommonObject{TicketObject}->TicketSearch(
-        Result  => 'ARRAY',
-        UserID  => 1,
-        SortBy  => 'Age',
-        OrderBy => 'Up',
-    );
-
-    _Output( TicketIDs => \@TicketIDs );
-
-    return 1;
-}
-
-sub _Search {
-    my %Param = @_;
-
-    my %SearchOptions = %{ $Param{SearchOptions} };
-
-    # search all tickets
-    my @TicketIDs = $CommonObject{TicketObject}->TicketSearch(
-        Result        => 'ARRAY',
-        UserID        => 1,
-        SortBy        => 'Age',
-        OrderBy       => 'Up',
-        ContentSearch => 'OR',
-        FullTextIndex => 1,
-        %SearchOptions,
-    );
-
-    _Output( TicketIDs => \@TicketIDs );
-
-    return 1;
-}
-
-sub _Output {
-    my %Param = @_;
-
-    my @TicketIDs = @{ $Param{TicketIDs} };
-
-    # to store all ticket details
-    my @Tickets;
-
-    TICKETID:
-    for my $TicketID (@TicketIDs) {
-
-        next TICKETID if !$TicketID;
-
-        # get ticket details
-        my %Ticket = $CommonObject{TicketObject}->TicketGet(
-            TicketID => $TicketID,
-            UserID   => 1,
-        );
-        next TICKETID if !%Ticket;
-
-        # store ticket details
-        push @Tickets, \%Ticket,
-    }
-
-    my %ColumnLength = (
-        ID       => 7,
-        Number   => 20,
-        Owner    => 24,
-        Customer => 24,
-        Title    => 24,
-    );
-
-    # print header
-    print "\n";
-    for my $HeaderName (qw(ID Number Owner Customer Title)) {
-        my $HeaderLength = length $HeaderName;
-        my $WhiteSpaces;
-        if ( $HeaderLength < $ColumnLength{$HeaderName} ) {
-            $WhiteSpaces = $ColumnLength{$HeaderName} - $HeaderLength;
-        }
-        print $HeaderName;
-        if ($WhiteSpaces) {
-            for ( 0 .. $WhiteSpaces ) {
-                print " ";
-            }
-        }
-    }
-    print "\n";
-
-    for ( 1 .. 100 ) {
-        print '=';
-    }
-    print "\n";
-
-    # print each ticket row
-    for my $Ticket (@Tickets) {
-
-        # prepare ticket information
-        $Ticket->{ID}       = $Ticket->{TicketID}       || '';
-        $Ticket->{Number}   = $Ticket->{TicketNumber}   || '';
-        $Ticket->{Owner}    = $Ticket->{Owner}          || '';
-        $Ticket->{Customer} = $Ticket->{CustomerUserID} || '';
-        $Ticket->{Title}    = $Ticket->{Title}          || '';
-
-        # print ticket row
-        for my $Element (qw(ID Number Owner Customer Title)) {
-            my $ElementLength = length $Ticket->{$Element};
-            my $WhiteSpaces;
-            if ( $ElementLength < $ColumnLength{$Element} ) {
-                $WhiteSpaces = $ColumnLength{$Element} - $ElementLength;
-            }
-            print $Ticket->{$Element};
-            if ($WhiteSpaces) {
-                for ( 0 .. $WhiteSpaces ) {
-                    print " ";
-                }
-            }
-        }
-        print "\n";
-    }
-    print "\n";
-
-    return 1;
-}
 
 sub _Delete {
     my %Param = @_;
@@ -387,14 +222,6 @@ otrs.DevDeleteTicket.pl - Command line interface to delete tickets.
 
 Usage: otrs.DevDeleteTicket.pl
 Options:
-    -a list                       # list all tickets
-
-    -a search -n *1234*           # search tickets with specified ticket number (wild cards are allowed)
-    -a search -t *welcome*        # search tickets with specified ticket title (wild cards are allowed)
-    -a serach -o root@localhost   # search tickets with specified ticket owner login
-    -a search -c carlos           # search tickets with specified ticket customer login
-    -a search -f *Text*           # full text search on fields To, From Cs Subject and Body (wild cards are allowed)
-
     -a delete -i 123              # deletes the ticket with ID 123
     -a delete -r 5..10            # deletes the tickets with IDs 5 to 10
     -a delete -x 1                # deletes all tickets in the system except otrs welcome ticket

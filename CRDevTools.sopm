@@ -2,27 +2,33 @@
 <otrs_package version="1.0">
     <Name>CRDevTools</Name>
     <Version>0.1.1</Version>
-    <Framework>4.0.x</Framework>
+    <Framework>5.0.x</Framework>
     <Vendor>Carlos Rodriguez</Vendor>
     <URL>http://https://github.com/carlosfrodriguez</URL>
     <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
     <Description Lang="en">The CR Development Tools Package.</Description>
     <Filelist>
+
         <!--
         <File Permission="644" Location="doc/en/CRDevTools.txt"/>
+        <File Permission="755" Location="bin/cr.DevDynamicFieldAdd.pl"/>
         -->
         <File Permission="755" Location="bin/cr.DevGroupDelete.pl" />
         <File Permission="755" Location="bin/cr.DevPriorityDelete.pl" />
+        <File Permission="755" Location="bin/cr.DevProcessManagement.pl"/>
         <File Permission="755" Location="bin/cr.DevQueueDelete.pl" />
         <File Permission="755" Location="bin/cr.DevStateDelete.pl" />
         <File Permission="755" Location="bin/cr.DevTicketDelete.pl" />
         <File Permission="755" Location="bin/cr.DevTypeDelete.pl" />
+        <File Permission="755" Location="bin/cr.DevUserDelete.pl" />
+        <File Permission="644" Location="Kernel/System/Console/Command/Maint/Ticket/CRSearch.pm"/>
         <File Permission="644" Location="Kernel/System/CR/Dev/Group.pm" />
         <File Permission="644" Location="Kernel/System/CR/Dev/Priority.pm" />
+        <File Permission="644" Location="Kernel/System/CR/Dev/Process.pm"/>
         <File Permission="644" Location="Kernel/System/CR/Dev/Queue.pm" />
         <File Permission="644" Location="Kernel/System/CR/Dev/State.pm" />
-        <File Permission="755" Location="bin/cr.DevUserDelete.pl" />
         <File Permission="644" Location="Kernel/System/CR/Dev/Type.pm" />
         <File Permission="644" Location="Kernel/System/CR/Dev/User.pm" />
+        <File Permission="644" Location="scripts/test/Console/Command/Maint/Ticket/CRSearch.t"/>
     </Filelist>
 </otrs_package>
