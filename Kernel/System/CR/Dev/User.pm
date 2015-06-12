@@ -151,7 +151,7 @@ sub UserDelete {
     # delete existing ticket_history user relation
     return if !$DBObject->Do(
         SQL => '
-            DELETE FROM article_flag
+            DELETE FROM ticket_history
             WHERE owner_id = ?
             OR create_by = ?',
         Bind => [ \$Param{UserID}, \$Param{UserID} ],
