@@ -2,7 +2,7 @@
 # --
 # bin/cr.DevTicketDelete.pl - Delete Tikets
 # This package is intended to work on Development and Testing Environments
-# Copyright (C) 2014 Carlos Rodriguez, https://github.com/carlosfrodriguez
+# Copyright (C) 2015 Carlos Rodriguez, https://github.com/carlosfrodriguez
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -21,7 +21,7 @@
 # --
 # DO NOT USE THIS FILE ON PRODUCTION SYSTEMS!
 #
-# otrs is Copyright (C) 2001-2014 OTRS AG, http://otrs.com/
+# otrs is Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
 
 use strict;
 use warnings;
@@ -400,7 +400,7 @@ Options:
     -a delete -x 1                # deletes all tickets in the system except otrs welcome ticket
     -a delete -x 2                # deletes all tickets in the system including otrs welcome ticket
 
-Copyright (C) 2014 Carlos Rodriguez
+Copyright (C) 2015 Carlos Rodriguez
 
 EOF
 

@@ -2,7 +2,7 @@
 # --
 # bin/cr.DevTypeDelete.pl - Delete Ticket Types
 # This package is intended to work on Development and Testing Environments
-# Copyright (C) 2014 Carlos Rodriguez, https://github.com/carlosfrodriguez
+# Copyright (C) 2015 Carlos Rodriguez, https://github.com/carlosfrodriguez
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -21,7 +21,7 @@
 # --
 # DO NOT USE THIS FILE ON PRODUCTION SYSTEMS!
 #
-# otrs is Copyright (C) 2001-2014 OTRS AG, http://otrs.com/
+# otrs is Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
 
 use strict;
 use warnings;
@@ -333,7 +333,7 @@ Options:
     -a delete -i 123 -x 1             # deletes the type with ID 123, and associated tickets
     -a delete -r 5..10                # deletes the types with IDs between 5 and 10
 
-Copyright (C) 2014 Carlos Rodriguez
+Copyright (C) 2015 Carlos Rodriguez
 
 EOF
 

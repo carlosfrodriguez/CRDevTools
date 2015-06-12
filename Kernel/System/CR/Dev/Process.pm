@@ -1,6 +1,6 @@
 # --
 # Kernel/System/CR/Dev/Process.pm - all Process Development functions
-# Copyright (C) 2001-2014 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -70,16 +70,11 @@ sub ProcessRemoveAll {
     my %CommonObject;
 
     # build common objects
-    $CommonObject{ActivityObject}
-        = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Activity');
-    $CommonObject{ActivityDialogObject}
-        = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::ActivityDialog');
-    $CommonObject{TransitionActionObject}
-        = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::TransitionAction');
-    $CommonObject{TransitionObject}
-        = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Transition');
-    $CommonObject{ProcessObject}
-        = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Process');
+    $CommonObject{ActivityObject}         = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Activity');
+    $CommonObject{ActivityDialogObject}   = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::ActivityDialog');
+    $CommonObject{TransitionActionObject} = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::TransitionAction');
+    $CommonObject{TransitionObject}       = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Transition');
+    $CommonObject{ProcessObject}          = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Process');
 
     for my $ProcessPart (qw(Process Activity ActivityDialog Transition TransitionAction)) {
         my $ListFunction = $ProcessPart . 'List';
@@ -106,23 +101,16 @@ sub ProcessImportRaw {
     my %CommonObject;
 
     # build common objects
-    $CommonObject{YAMLObject} = $Kernel::OM->Get('Kernel::System::YAML');
-    $CommonObject{ActivityObject}
-        = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Activity');
-    $CommonObject{ActivityDialogObject}
-        = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::ActivityDialog');
-    $CommonObject{TransitionActionObject}
-        = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::TransitionAction');
-    $CommonObject{TransitionObject}
-        = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Transition');
-    $CommonObject{DynamicFieldObject} = $Kernel::OM->Get('Kernel::System::DynamicField');
-    $CommonObject{BackendObject}
-        = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
-    $CommonObject{ProcessObject}
-        = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Process');
-    $CommonObject{EntityObject}
-        = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Entity');
-    $CommonObject{LogObject} = $Kernel::OM->Get('Kernel::System::Log');
+    $CommonObject{YAMLObject}             = $Kernel::OM->Get('Kernel::System::YAML');
+    $CommonObject{ActivityObject}         = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Activity');
+    $CommonObject{ActivityDialogObject}   = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::ActivityDialog');
+    $CommonObject{TransitionActionObject} = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::TransitionAction');
+    $CommonObject{TransitionObject}       = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Transition');
+    $CommonObject{DynamicFieldObject}     = $Kernel::OM->Get('Kernel::System::DynamicField');
+    $CommonObject{BackendObject}          = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    $CommonObject{ProcessObject}          = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Process');
+    $CommonObject{EntityObject}           = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Entity');
+    $CommonObject{LogObject}              = $Kernel::OM->Get('Kernel::System::Log');
 
     for my $Needed (qw(Content UserID)) {
 
@@ -249,8 +237,7 @@ sub ProcessImportRaw {
     );
 
     # keep entities
-    $EntityMapping{Process}->{ $ProcessData->{Process}->{EntityID} }
-        = $ProcessData->{Process}->{EntityID};
+    $EntityMapping{Process}->{ $ProcessData->{Process}->{EntityID} } = $ProcessData->{Process}->{EntityID};
 
     for my $PartName (qw(Activity ActivityDialog Transition TransitionAction)) {
         for my $PartEntityID ( sort keys %{ $ProcessData->{ $PartNameMap{$PartName} } } ) {
@@ -452,8 +439,7 @@ sub ProcessImportRaw {
 sub ProcessTicketDeleteAll {
     my ( $Self, %Param ) = @_;
 
-    my $ProcessIDDF = $Kernel::OM->Get('Kernel::Config')
-        ->Get('Process::DynamicFieldProcessManagementProcessID');
+    my $ProcessIDDF = $Kernel::OM->Get('Kernel::Config')->Get('Process::DynamicFieldProcessManagementProcessID');
 
     # get ticket object
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
@@ -517,7 +503,7 @@ sub GenerateProcessTicket {
 
     my $ProcessList = $ProcessObject->ProcessList(
         ProcessState => [ 'Active', 'FadeAway', 'Inactive' ],
-        Interface => 'all',
+        Interface    => 'all',
     );
 
     my @SimpleProcessList = sort keys %{$ProcessList};
@@ -562,19 +548,17 @@ sub ProcessDeploy {
     my $Location = $Kernel::OM->Get('Kernel::Config')->Get('Home')
         . '/Kernel/Config/Files/ZZZProcessManagement.pm';
 
-    my $ProcessDump
-        = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Process')->ProcessDump(
+    my $ProcessDump = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Process')->ProcessDump(
         ResultType => 'FILE',
         Location   => $Location,
         UserID     => 1,
-        );
+    );
 
     if ($ProcessDump) {
 
-        my $Success = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Entity')
-            ->EntitySyncStatePurge(
+        my $Success = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Entity')->EntitySyncStatePurge(
             UserID => 1,
-            );
+        );
 
         if ( !$Success ) {
 

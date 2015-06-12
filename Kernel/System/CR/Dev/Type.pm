@@ -1,6 +1,6 @@
 # --
 # Kernel/System/CR/Dev/Type.pm - all Ticket Type Development functions
-# Copyright (C) 2001-2014 OTRS AG, http://otrs.com/
+# Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -172,7 +172,7 @@ sub TypeSearch {
 
     # get data
     return if !$DBObject->Prepare(
-        SQL => $SQL,
+        SQL   => $SQL,
         Limit => $Self->{UserSearchListLimit} || $Param{Limit},
     );
 
