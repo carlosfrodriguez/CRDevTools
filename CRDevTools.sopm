@@ -18,10 +18,10 @@
         <File Permission="755" Location="bin/cr.DevProcessManagement.pl"/>
         <File Permission="755" Location="bin/cr.DevQueueDelete.pl" />
         <File Permission="755" Location="bin/cr.DevStateDelete.pl" />
-        <File Permission="755" Location="bin/cr.DevTicketDelete.pl" />
         <File Permission="755" Location="bin/cr.DevTypeDelete.pl" />
         <File Permission="755" Location="bin/cr.DevUserDelete.pl" />
-        <File Permission="644" Location="Kernel/System/Console/Command/Maint/Ticket/CRSearch.pm"/>
+        <File Permission="644" Location="Kernel/System/Console/Command/CR/Dev/Ticket/Delete.pm" />
+        <File Permission="644" Location="Kernel/System/Console/Command/CR/Dev/Ticket/Search.pm" />
         <File Permission="644" Location="Kernel/System/CR/Dev/Group.pm" />
         <File Permission="644" Location="Kernel/System/CR/Dev/Priority.pm" />
         <File Permission="644" Location="Kernel/System/CR/Dev/Process.pm"/>
@@ -29,6 +29,7 @@
         <File Permission="644" Location="Kernel/System/CR/Dev/State.pm" />
         <File Permission="644" Location="Kernel/System/CR/Dev/Type.pm" />
         <File Permission="644" Location="Kernel/System/CR/Dev/User.pm" />
-        <File Permission="644" Location="scripts/test/Console/Command/Maint/Ticket/CRSearch.t"/>
+        <File Permission="644" Location="scripts/test/Console/Command/CR/Dev/Ticket/Delete.t" />
+        <File Permission="644" Location="scripts/test/Console/Command/CR/Dev/Ticket/Search.t" />
     </Filelist>
 </otrs_package>
