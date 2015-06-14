@@ -49,7 +49,7 @@
 ###Search Tools:
 * CR::Dev::Ticket::Search
 
-  Search tickets by number, title customer owner or full-text (From To Cc Subject Body).
+  Search tickets by number, title customer owner or full-text (from to cc subject body).
 
 ###General Tools:
 
