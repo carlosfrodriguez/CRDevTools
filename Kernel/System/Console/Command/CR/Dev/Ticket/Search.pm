@@ -6,7 +6,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Console::Command::Maint::Ticket::CRSearch;
+package Kernel::System::Console::Command::CR::Dev::Ticket::Search;
 
 use strict;
 use warnings;

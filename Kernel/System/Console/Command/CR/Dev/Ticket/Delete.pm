@@ -6,7 +6,7 @@
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::System::Console::Command::Maint::Ticket::CRDelete;
+package Kernel::System::Console::Command::CR::Dev::Ticket::Delete;
 
 use strict;
 use warnings;
@@ -50,7 +50,7 @@ sub Configure {
 sub PreRun {
     my ( $Self, %Param ) = @_;
 
-    my $OptionsCounter;
+    my $OptionsCounter = 0;
     for my $Option (qw(ticket-id ticket-id-range clean-system)) {
         if ( $Self->GetOption($Option) ) {
             $OptionsCounter++;

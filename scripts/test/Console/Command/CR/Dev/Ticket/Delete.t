@@ -13,14 +13,14 @@ use utf8;
 
 use vars (qw($Self));
 
-my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::Maint::Ticket::CRDelete');
+my $CommandObject = $Kernel::OM->Get('Kernel::System::Console::Command::CR::Dev::Ticket::Delete');
 
 my $ExitCode = $CommandObject->Execute();
 
 $Self->Is(
     $ExitCode,
     0,
-    "Maint::Ticket::CRDelete exit code",
+    "CR::Dev::Ticket::Delete exit code",
 );
 
 # It is also possible to capture the command output, see test/Console/Command/Maint/Config/Dump.t for an example.
