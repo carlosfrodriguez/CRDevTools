@@ -28,11 +28,11 @@
 
   Can delete associated tickets.
 
-* cr.DevTicketDelete:
+* CR::Dev::Ticket::Delete:
 
    Delete tickets from DB, including Articles and History (using OTRS API).
 
-   Can delete all tickets at once (leaving or not initial ticket).
+   Can delete all tickets at once (leaving initial ticket).
 
 * cr.DevTypeDelete:
 
@@ -46,7 +46,10 @@
 
   **Warning:** As many tables are related to **_&lt;User Table&gt;_** before try to delete any user it is necessary to check if is not referenced by any other table.
 
-All this tools contains a list and search options.
+###Search Tools:
+* CR::Dev::Ticket::Search
+
+  Search tickets by number, title customer owner or full-text (From To Cc Subject Body).
 
 ###General Tools:
 
