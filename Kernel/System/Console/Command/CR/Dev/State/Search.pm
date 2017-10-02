@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2016 Carlos Rodriguez, https://github.com/carlosfrodriguez
+# Copyright (C) 2017 Carlos Rodriguez, https://github.com/carlosfrodriguez
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -7,7 +7,7 @@
 # --
 # DO NOT USE THIS FILE ON PRODUCTION SYSTEMS!
 #
-# otrs is Copyright (C) 2001-2016 OTRS AG, http://otrs.com/
+# otrs is Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
 # --
 
 package Kernel::System::Console::Command::CR::Dev::State::Search;

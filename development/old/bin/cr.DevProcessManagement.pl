@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# Copyright (C) 2015 Carlos Rodriguez, https://github.com/carlosfrodriguez
+# Copyright (C) 2017 Carlos Rodriguez, https://github.com/carlosfrodriguez
 # --
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU AFFERO General Public License as published by
@@ -19,7 +19,7 @@
 # --
 # DO NOT USE THIS FILE ON PRODUCTION SYSTEMS!
 #
-# otrs is Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
+# otrs is Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
 
 use strict;
 use warnings;
