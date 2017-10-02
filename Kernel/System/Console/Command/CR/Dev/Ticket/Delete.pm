@@ -1,9 +1,13 @@
 # --
-# Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
+# Copyright (C) 2016 Carlos Rodriguez, https://github.com/carlosfrodriguez
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+# DO NOT USE THIS FILE ON PRODUCTION SYSTEMS!
+#
+# otrs is Copyright (C) 2001-2016 OTRS AG, http://otrs.com/
 # --
 
 package Kernel::System::Console::Command::CR::Dev::Ticket::Delete;
@@ -11,7 +15,7 @@ package Kernel::System::Console::Command::CR::Dev::Ticket::Delete;
 use strict;
 use warnings;
 
-use base qw(Kernel::System::Console::BaseCommand);
+use parent qw(Kernel::System::Console::BaseCommand);
 
 our @ObjectDependencies = (
     'Kernel::System::Ticket',
@@ -22,7 +26,7 @@ sub Configure {
 
     $Self->Description('Delete one or more tickets.');
     $Self->AddOption(
-        Name        => 'ticket-id',
+        Name        => 'id',
         Description => "Specify one or more ticket ids of tickets to be deleted.",
         Required    => 0,
         HasValue    => 1,
@@ -30,7 +34,7 @@ sub Configure {
         Multiple    => 1,
     );
     $Self->AddOption(
-        Name        => 'ticket-id-range',
+        Name        => 'id-range',
         Description => "Specify a range of ticket ids to be deleted. (e.g. 1..10)",
         Required    => 0,
         HasValue    => 1,
@@ -51,14 +55,14 @@ sub PreRun {
     my ( $Self, %Param ) = @_;
 
     my $OptionsCounter = 0;
-    for my $Option (qw(ticket-id ticket-id-range clean-system)) {
+    for my $Option (qw(id id-range clean-system)) {
         if ( $Self->GetOption($Option) ) {
             $OptionsCounter++;
         }
     }
 
     if ( $OptionsCounter > 1 ) {
-        die("Only one option (ticket-id or ticket-id-range or clean-system) can be used at a time!\n");
+        die("Only one option (id or id-range or clean-system) can be used at a time!\n");
     }
 
     return;
@@ -72,11 +76,11 @@ sub Run {
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
     my @TicketIDs;
-    if ( $Self->GetOption('ticket-id') ) {
-        @TicketIDs = @{ $Self->GetOption('ticket-id') };
+    if ( $Self->GetOption('id') ) {
+        @TicketIDs = @{ $Self->GetOption('id') };
     }
-    elsif ( $Self->GetOption('ticket-id-range') ) {
-        if ( $Self->GetOption('ticket-id-range') =~ m{\A(\d+)\.\.(\d+)\z} ) {
+    elsif ( $Self->GetOption('id-range') ) {
+        if ( $Self->GetOption('id-range') =~ m{\A(\d+)\.\.(\d+)\z} ) {
             @TicketIDs = ( $1 .. $2 );
         }
     }
@@ -145,11 +149,9 @@ sub Run {
 
 1;
 
-=back
-
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is a component of the CRDevTools project (L<https://github.com/carlosfrodriguez/CRDevTools/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
 the enclosed file COPYING for license information (AGPL). If you

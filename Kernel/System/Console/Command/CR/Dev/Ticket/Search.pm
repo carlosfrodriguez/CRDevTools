@@ -1,9 +1,13 @@
 # --
-# Copyright (C) 2001-2015 OTRS AG, http://otrs.com/
+# Copyright (C) 2016 Carlos Rodriguez, https://github.com/carlosfrodriguez
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# --
+# DO NOT USE THIS FILE ON PRODUCTION SYSTEMS!
+#
+# otrs is Copyright (C) 2001-2016 OTRS AG, http://otrs.com/
 # --
 
 package Kernel::System::Console::Command::CR::Dev::Ticket::Search;
@@ -11,7 +15,10 @@ package Kernel::System::Console::Command::CR::Dev::Ticket::Search;
 use strict;
 use warnings;
 
-use base qw(Kernel::System::Console::BaseCommand);
+use parent qw(
+    Kernel::System::Console::BaseCommand
+    Kernel::System::Console::CRBaseCommand
+);
 
 our @ObjectDependencies = (
     'Kernel::System::Ticket',
@@ -121,7 +128,7 @@ sub Run {
         %SearchOptions,
     );
 
-    my @Tickets;
+    my @Items;
     TICKETID:
     for my $TicketID (@TicketIDs) {
 
@@ -134,8 +141,22 @@ sub Run {
         );
         next TICKETID if !%Ticket;
 
+        # prepare ticket information
+        $Ticket{ID}       = $Ticket{TicketID}       || '';
+        $Ticket{Number}   = $Ticket{TicketNumber}   || '';
+        $Ticket{Owner}    = $Ticket{Owner}          || '';
+        $Ticket{Customer} = $Ticket{CustomerUserID} || '';
+        $Ticket{Title}    = $Ticket{Title}          || '';
+
         # store ticket details
-        push @Tickets, \%Ticket,
+        push @Items, \%Ticket,
+    }
+
+    if ( !@Items ) {
+        $Self->Print("No tickets found\n");
+
+        $Self->Print("<green>Done.</green>\n");
+        return $Self->ExitCodeOk();
     }
 
     my %ColumnLength = (
@@ -146,57 +167,17 @@ sub Run {
         Title    => 24,
     );
 
-    my $Header;
-    for my $HeaderName (qw(ID Number Owner Customer Title)) {
-        my $HeaderLength = length $HeaderName;
-        my $WhiteSpaces;
-        if ( $HeaderLength < $ColumnLength{$HeaderName} ) {
-            $WhiteSpaces = $ColumnLength{$HeaderName} - $HeaderLength;
-        }
-
-        # $WhiteSpaces = $WhiteSpaces + 3;
-        # print STDERR "Debug $WhiteSpaces \n"; # TODO: Delete developer comment
-        $Header .= sprintf '%-*s', $ColumnLength{$HeaderName}, "$HeaderName";
-    }
-    $Header .= "\n";
-    $Header .= '=' x 100;
-    $Self->Print("$Header\n");
-
-    if ( !@Tickets ) {
-        $Self->Print("No tickets found\n");
-
-        $Self->Print("<green>Done.</green>\n");
-        return $Self->ExitCodeOk();
-    }
-
-    my $Content;
-
-    # print each ticket row
-    for my $Ticket (@Tickets) {
-
-        my $Row;
-
-        # prepare ticket information
-        $Ticket->{ID}       = $Ticket->{TicketID}       || '';
-        $Ticket->{Number}   = $Ticket->{TicketNumber}   || '';
-        $Ticket->{Owner}    = $Ticket->{Owner}          || '';
-        $Ticket->{Customer} = $Ticket->{CustomerUserID} || '';
-        $Ticket->{Title}    = $Ticket->{Title}          || '';
-
-        # print ticket row
-        for my $Element (qw(ID Number Owner Customer Title)) {
-            my $ElementLength = length $Ticket->{$Element};
-            my $WhiteSpaces;
-            if ( $ElementLength < $ColumnLength{$Element} ) {
-                $WhiteSpaces = $ColumnLength{$Element} - $ElementLength;
-            }
-            $Row .= sprintf '%-*s', $ColumnLength{$Element}, $Ticket->{$Element};
-        }
-        $Row .= "\n";
-        $Content .= $Row;
-    }
-
-    $Self->Print("$Content\n");
+    $Self->OutputTable(
+        Items        => \@Items,
+        Columns      => [ 'ID', 'Number', 'Owner', 'Customer', 'Title' ],
+        ColumnLength => {
+            ID       => 7,
+            Number   => 20,
+            Owner    => 24,
+            Customer => 30,
+            Title    => 24,
+        },
+    );
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();
@@ -204,11 +185,9 @@ sub Run {
 
 1;
 
-=back
-
 =head1 TERMS AND CONDITIONS
 
-This software is part of the OTRS project (L<http://otrs.org/>).
+This software is a component of the CRDevTools project (L<https://github.com/carlosfrodriguez/CRDevTools/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
 the enclosed file COPYING for license information (AGPL). If you
