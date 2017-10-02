@@ -15,6 +15,7 @@ use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
     'Kernel::System::DB',
+    'Kernel::System::Cache',
     'Kernel::System::Group',
     'Kernel::System::log',
 );
@@ -137,8 +138,28 @@ sub GroupDelete {
     );
 
     # delete cache
-    $GroupObject->{CacheInternalObject}->CleanUp();
-
+    my $CacheObject = $Kernel::OM->Get('Kernel::System::Cache');
+    $CacheObject->Delete(
+        Type => 'Group',
+        Key  => 'GroupDataList',
+    );
+    $CacheObject->Delete(
+        Type => 'Group',
+        Key  => 'GroupList::0',
+    );
+    $CacheObject->Delete(
+        Type => 'Group',
+        Key  => 'GroupList::1',
+    );
+    $CacheObject->CleanUp(
+        Type => 'CustomerGroup',
+    );
+    $CacheObject->CleanUp(
+        Type => 'GroupPermissionUserGet',
+    );
+    $CacheObject->CleanUp(
+        Type => 'GroupPermissionGroupGet',
+    );
     return 1;
 }
 
@@ -211,7 +232,7 @@ sub GroupSearch {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the CRDevTools project (L<https://github.com/carlosfrodriguez/CRDevTools/>).
+This software is is a component of the CRDevTools project (L<https://github.com/carlosfrodriguez/CRDevTools/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
 the enclosed file COPYING for license information (AGPL). If you

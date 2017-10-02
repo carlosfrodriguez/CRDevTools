@@ -182,13 +182,87 @@ sub UserDelete {
     return 1;
 }
 
+sub RelatedTicketsGet {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !$Param{User} && !$Param{UserID} ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'Need User or UserID!'
+        );
+        return;
+    }
+
+    # set UserID
+    my $UserID = $Param{UserID} || '';
+    if ( !$UserID ) {
+        my $UserID = $Kernel::OM->Get('Kernel::System::DB')->UserLookup(
+            User => $Param{User},
+        );
+    }
+    if ( !$UserID ) {
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
+            Priority => 'error',
+            Message  => 'User is invalid!'
+        );
+        return;
+    }
+
+    my $DBObject = $Kernel::OM->Get('Kernel::System::DB');
+
+    # build SQL string
+    my $SQL = '
+        SELECT id, tn
+        FROM ticket
+        WHERE create_by = ?
+            OR change_by = ?
+            OR responsible_user_id = ?
+            OR user_id = ?';
+
+    # get data
+    return if !$DBObject->Prepare(
+        SQL   => $SQL,
+        Bind  => [ \$UserID, \$UserID, \$UserID, \$UserID, ],
+        Limit => $Param{Limit},
+    );
+
+    my %TicketIDs;
+
+    # fetch the result
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        $TicketIDs{ $Row[0] } = $Row[1];
+    }
+
+    # build SQL string
+    $SQL = '
+        SELECT ticket_id, id
+        FROM article
+        WHERE create_by = ?
+            OR change_by = ?';
+
+    # get data
+    return if !$DBObject->Prepare(
+        SQL   => $SQL,
+        Bind  => [ \$UserID, \$UserID, ],
+        Limit => $Param{Limit},
+    );
+
+    # fetch the result
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        $TicketIDs{ $Row[0] } = $Row[1];
+    }
+
+    return keys %TicketIDs;
+}
+
 1;
 
 =back
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the CRDevTools project (L<https://github.com/carlosfrodriguez/CRDevTools/>).
+This software is is a component of the CRDevTools project (L<https://github.com/carlosfrodriguez/CRDevTools/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
 the enclosed file COPYING for license information (AGPL). If you

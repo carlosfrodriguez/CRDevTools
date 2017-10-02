@@ -73,7 +73,7 @@ Deletes a ticket Priority from DB
     );
 
 Returns:
-    $Sucesss = 1;                           # or false if there was any error.
+    $Success = 1;                           # or false if there was any error.
 
 =cut
 
@@ -125,7 +125,7 @@ sub PriorityDelete {
 
 =item PrioritySearch()
 
-To search Prioritys
+To search Priorities
 
     my %List = $DevPriorityObject->PrioritySearch(
         Name  => '*some*', # also 'hans+huber' possible
@@ -159,7 +159,7 @@ sub PrioritySearch {
     # build SQL string 1/2
     my $SQL = '
         SELECT id, name
-        FROM ticket_Priority
+        FROM ticket_priority
         WHERE';
 
     # build SQL string 2/2
@@ -193,7 +193,7 @@ sub PrioritySearch {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the CRDevTools project (L<https://github.com/carlosfrodriguez/CRDevTools/>).
+This software is is a component of the CRDevTools project (L<https://github.com/carlosfrodriguez/CRDevTools/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
 the enclosed file COPYING for license information (AGPL). If you

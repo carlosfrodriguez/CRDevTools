@@ -189,7 +189,7 @@ sub TypeSearch {
 
 =head1 TERMS AND CONDITIONS
 
-This software is part of the CRDevTools project (L<https://github.com/carlosfrodriguez/CRDevTools/>).
+This software is is a component of the CRDevTools project (L<https://github.com/carlosfrodriguez/CRDevTools/>).
 
 This software comes with ABSOLUTELY NO WARRANTY. For details, see
 the enclosed file COPYING for license information (AGPL). If you

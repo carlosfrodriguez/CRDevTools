@@ -1,35 +1,47 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <otrs_package version="1.0">
     <Name>CRDevTools</Name>
-    <Version>0.1.1</Version>
+    <Version>0.0.0</Version>
     <Framework>5.0.x</Framework>
+    <Framework>6.0.x</Framework>
+    <Framework>7.0.x</Framework>
     <Vendor>Carlos Rodriguez</Vendor>
     <URL>http://https://github.com/carlosfrodriguez</URL>
     <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
     <Description Lang="en">The CR Development Tools Package.</Description>
     <Filelist>
-
-        <!--
-        <File Permission="644" Location="doc/en/CRDevTools.txt"/>
-        <File Permission="755" Location="bin/cr.DevDynamicFieldAdd.pl"/>
-        -->
-        <File Permission="755" Location="bin/cr.DevGroupDelete.pl" />
-        <File Permission="755" Location="bin/cr.DevPriorityDelete.pl" />
-        <File Permission="755" Location="bin/cr.DevProcessManagement.pl"/>
-        <File Permission="755" Location="bin/cr.DevQueueDelete.pl" />
-        <File Permission="755" Location="bin/cr.DevStateDelete.pl" />
-        <File Permission="755" Location="bin/cr.DevTypeDelete.pl" />
-        <File Permission="755" Location="bin/cr.DevUserDelete.pl" />
-        <File Permission="644" Location="Kernel/System/Console/Command/CR/Dev/Ticket/Delete.pm" />
-        <File Permission="644" Location="Kernel/System/Console/Command/CR/Dev/Ticket/Search.pm" />
-        <File Permission="644" Location="Kernel/System/CR/Dev/Group.pm" />
-        <File Permission="644" Location="Kernel/System/CR/Dev/Priority.pm" />
-        <File Permission="644" Location="Kernel/System/CR/Dev/Process.pm"/>
-        <File Permission="644" Location="Kernel/System/CR/Dev/Queue.pm" />
-        <File Permission="644" Location="Kernel/System/CR/Dev/State.pm" />
-        <File Permission="644" Location="Kernel/System/CR/Dev/Type.pm" />
-        <File Permission="644" Location="Kernel/System/CR/Dev/User.pm" />
-        <File Permission="644" Location="scripts/test/Console/Command/CR/Dev/Ticket/Delete.t" />
-        <File Permission="644" Location="scripts/test/Console/Command/CR/Dev/Ticket/Search.t" />
+        <File Permission="660" Location="Kernel/System/Console/CRBaseCommand.pm" />
+        <File Permission="660" Location="Kernel/System/Console/Command/CR/Dev/ACL/Delete.pm" />
+        <File Permission="660" Location="Kernel/System/Console/Command/CR/Dev/ACL/Search.pm" />
+        <File Permission="660" Location="Kernel/System/Console/Command/CR/Dev/CustomerUser/Delete.pm" />
+        <File Permission="660" Location="Kernel/System/Console/Command/CR/Dev/CustomerUser/Search.pm" />
+        <File Permission="660" Location="Kernel/System/Console/Command/CR/Dev/Group/Delete.pm" />
+        <File Permission="660" Location="Kernel/System/Console/Command/CR/Dev/Group/Search.pm" />
+        <File Permission="660" Location="Kernel/System/Console/Command/CR/Dev/Priority/Delete.pm" />
+        <File Permission="660" Location="Kernel/System/Console/Command/CR/Dev/Priority/Search.pm" />
+        <File Permission="660" Location="Kernel/System/Console/Command/CR/Dev/Process/Delete.pm" />
+        <File Permission="660" Location="Kernel/System/Console/Command/CR/Dev/Process/Search.pm" />
+        <File Permission="660" Location="Kernel/System/Console/Command/CR/Dev/Queue/Delete.pm" />
+        <File Permission="660" Location="Kernel/System/Console/Command/CR/Dev/Queue/Search.pm" />
+        <File Permission="660" Location="Kernel/System/Console/Command/CR/Dev/Service/Delete.pm" />
+        <File Permission="660" Location="Kernel/System/Console/Command/CR/Dev/Service/Search.pm" />
+        <File Permission="660" Location="Kernel/System/Console/Command/CR/Dev/State/Delete.pm" />
+        <File Permission="660" Location="Kernel/System/Console/Command/CR/Dev/State/Search.pm" />
+        <File Permission="660" Location="Kernel/System/Console/Command/CR/Dev/Ticket/Delete.pm" />
+        <File Permission="660" Location="Kernel/System/Console/Command/CR/Dev/Ticket/Search.pm" />
+        <File Permission="660" Location="Kernel/System/Console/Command/CR/Dev/Type/Delete.pm" />
+        <File Permission="660" Location="Kernel/System/Console/Command/CR/Dev/Type/Search.pm" />
+        <File Permission="660" Location="Kernel/System/Console/Command/CR/Dev/User/Delete.pm" />
+        <File Permission="660" Location="Kernel/System/Console/Command/CR/Dev/User/Search.pm" />
+        <File Permission="660" Location="Kernel/System/CR/Dev/ACL.pm" />
+        <File Permission="660" Location="Kernel/System/CR/Dev/CustomerUser.pm" />
+        <File Permission="660" Location="Kernel/System/CR/Dev/Group.pm" />
+        <File Permission="660" Location="Kernel/System/CR/Dev/Priority.pm" />
+        <File Permission="660" Location="Kernel/System/CR/Dev/Process.pm" />
+        <File Permission="660" Location="Kernel/System/CR/Dev/Queue.pm" />
+        <File Permission="660" Location="Kernel/System/CR/Dev/Service.pm" />
+        <File Permission="660" Location="Kernel/System/CR/Dev/State.pm" />
+        <File Permission="660" Location="Kernel/System/CR/Dev/Type.pm" />
+        <File Permission="660" Location="Kernel/System/CR/Dev/User.pm" />
     </Filelist>
 </otrs_package>
