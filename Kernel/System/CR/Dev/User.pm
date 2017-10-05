@@ -18,6 +18,7 @@ our @ObjectDependencies = (
     'Kernel::System::Cache',
     'Kernel::System::DB',
     'Kernel::System::Log',
+    'Kernel::System::User',
 );
 
 =head1 NAME
@@ -93,7 +94,7 @@ sub UserDelete {
     # set UserID
     my $UserID = $Param{UserID} || '';
     if ( !$UserID ) {
-        my $UserID = $Kernel::OM->Get('Kernel::System::DB')->UserLookup(
+        my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
             User => $Param{User},
         );
     }
@@ -197,7 +198,7 @@ sub RelatedTicketsGet {
     # set UserID
     my $UserID = $Param{UserID} || '';
     if ( !$UserID ) {
-        my $UserID = $Kernel::OM->Get('Kernel::System::DB')->UserLookup(
+        my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
             User => $Param{User},
         );
     }
