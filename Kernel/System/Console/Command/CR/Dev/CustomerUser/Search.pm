@@ -86,8 +86,9 @@ sub Run {
         );
     }
     else {
-        %List = $Kernel::OM->Get('Kernel::System::CustomerUser')->CustomerUserList(
-            Valid => 0,
+        %List = $CustomerUserObject->CustomerSearch(
+            Search => '**',
+            Valid  => 0,
         );
     }
 
