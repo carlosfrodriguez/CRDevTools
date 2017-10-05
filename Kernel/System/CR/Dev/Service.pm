@@ -139,7 +139,7 @@ sub ServiceDelete {
         Bind => [ \$ServiceID, ],
     );
 
-    # delete Queue from DB
+    # delete Service from DB
     return if !$DBObject->Do(
         SQL => "
             DELETE FROM service
