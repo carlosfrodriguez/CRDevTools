@@ -17,7 +17,7 @@ our @ObjectDependencies = (
     'Kernel::System::DB',
     'Kernel::System::Cache',
     'Kernel::System::Group',
-    'Kernel::System::log',
+    'Kernel::System::Log',
 );
 
 =head1 NAME
@@ -82,7 +82,7 @@ sub GroupDelete {
 
     # check needed stuff
     if ( !$Param{Group} && !$Param{GroupID} ) {
-        $Kernel::OM->Get('Kernel::System::log')->Log(
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
             Group   => 'error',
             Message => 'Need User or UserID!'
         );
@@ -100,7 +100,7 @@ sub GroupDelete {
         );
     }
     if ( !$GroupID ) {
-        $Kernel::OM->Get('Kernel::System::log')->Log(
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
             Group   => 'error',
             Message => 'Group is invalid!'
         );
@@ -182,7 +182,7 @@ sub GroupSearch {
 
     # check needed stuff
     if ( !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::log')->Log(
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
             Group   => 'error',
             Message => 'Need Name!',
         );

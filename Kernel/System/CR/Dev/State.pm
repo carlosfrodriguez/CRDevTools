@@ -97,7 +97,7 @@ sub StateDelete {
         );
     }
     if ( !$StateID ) {
-        $Kernel::OM->Get('Kernel::System::DB')->Log(
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message  => 'State is invalid!'
         );
@@ -139,7 +139,7 @@ sub StateSearch {
 
     # check needed stuff
     if ( !$Param{Name} ) {
-        $Kernel::OM->Get('Kernel::System::DB')->Log(
+        $Kernel::OM->Get('Kernel::System::Log')->Log(
             Priority => 'error',
             Message  => 'Need Name!',
         );
