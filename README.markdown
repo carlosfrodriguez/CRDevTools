@@ -1,6 +1,6 @@
-#CRDevTools
+# CRDevTools
 
-###Development Tools for OTRS
+## Development Tools for OTRS
 From now on this tools are part of the OTRS Console Command Interface and they should be called as:
 
 ```perl
@@ -14,9 +14,9 @@ bin/otrs.Console.pl CR::Dev::ACL::Delete
 
 Use parameter --help to get more information on the options and general usage of each tool.
 
-##Included Tools:
+## Included Tools:
 
-###Delete Tools:
+### Delete Tools:
 * CR::Dev::ACL::Delete:
 
   Delete ACLs from DB, also generates an ACL deployment to sync ZZZACL.pm file.
@@ -79,12 +79,12 @@ Use parameter --help to get more information on the options and general usage of
 
   **Warning:** As many tables are related to **_&lt;User Table&gt;_** before try to delete any user it is necessary to check if is not referenced by any other table.
 
-###Search Tools:
+### Search Tools:
 * CR::Dev::Ticket::Search
 
   Search tickets by number, title customer owner or full-text (from to cc subject body).
 
-###General Tools:
+### General Tools:
 
 * cr.DevProcessManagement:
 
@@ -98,7 +98,7 @@ Use parameter --help to get more information on the options and general usage of
 
    Generate tickets for available processes using a random process and a random activity.
 
-####Note:
+#### Note:
 This package is not intended to be use on production systems, please be aware of potential data lost.
 
 Use it carefully and at your own risk, data deleted by included tools might be unrecoverable!
