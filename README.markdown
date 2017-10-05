@@ -1,28 +1,61 @@
 #CRDevTools
 
 ###Development Tools for OTRS
+From now on this tools are part of the OTRS Console Command Interface and they should be called as:
+
+```perl
+bin/otrs.Console.pl CR::Dev::<Object>::<Tool>
+```
+e.g.
+
+```perl
+bin/otrs.Console.pl CR::Dev::ACL::Delete
+```
+
+Use parameter --help to get more information on the options and general usage of each tool.
 
 ##Included Tools:
 
 ###Delete Tools:
+* CR::Dev::ACL::Delete:
 
-* cr.DevGroupDelete:
+  Delete ACLs from DB, also generates an ACL deployment to sync ZZZACL.pm file.
+
+* CR::Dev::CustomerUser::Delete:
+
+  Delete customer users from DB, also removes relations from **_&lt;CustomerUser Preferences Table&gt;_**
+
+  TODO: Delete group relations
+
+* CR::Dev::Group::Delete:
 
   Delete groups from DB, also removes relations from _group_user_ and _group_role_.
 
-* cr.DevPriorityDelete:
+  TODO: Delete CustomerUser relations
+
+* CR::Dev::Priority::Delete:
 
   Delete ticket priorities from DB.
 
   Can delete associated tickets.
 
-* cr.DevQueueDelete:
+* CR::Dev::Process::Delete:
+
+  Delete processes drom DB, also generates an process deployment to sync ZZZProcessManagement.pm file.
+
+* CR::Dev::Queue::Delete:
 
   Delete queues from DB, also removes relations from _personal_queues_, _queue_auto_response_, _queue_perferences_ and _queue_standard_template_.
 
   Can delete associated tickets.
 
-* cr.DevStateDelete:
+* CR::Dev::Service::Delete:
+
+  Delete services from DB, also removes relations from _service_customer_user_, _service_preferences_, _service_sla_ and _personal_services_.
+
+  Can delete associated tickets.
+
+* CR::Dev::State::Delete:
 
   Delete ticket states from DB.
 
@@ -34,13 +67,13 @@
 
    Can delete all tickets at once (leaving initial ticket).
 
-* cr.DevTypeDelete:
+* CR::Dev::Type::Delete:
 
    Delete ticket types from the DB.
 
    Can delete associated tickets.
 
-* cr.DevUserDelete:
+* CR::Dev::User::Delete:
 
   Delete users from DB, also removes relations from _group_user_, _role_user_, _article_fag_, _ticket_history_ and **_&lt;User Preferences Table&gt;_**
 
