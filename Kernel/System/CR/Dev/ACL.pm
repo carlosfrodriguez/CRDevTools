@@ -20,11 +20,11 @@ our @ObjectDependencies = (
 
 =head1 NAME
 
-Kernel::System::CR::Dev::Type - Ticket Type Dev lib
+Kernel::System::CR::Dev::ACL - Ticket ACL Dev lib
 
 =head1 SYNOPSIS
 
-All Ticket Type Development functions.
+All Ticket ACL Development functions.
 
 =head1 PUBLIC INTERFACE
 
@@ -38,7 +38,7 @@ create an object. Do not use it directly, instead use:
 
     use Kernel::System::ObjectManager;
     local $Kernel::OM = Kernel::System::ObjectManager->new();
-    my $ValidObject = $Kernel::OM->Get('Kernel::System::CR::Dev::Type');
+    my $ValidObject = $Kernel::OM->Get('Kernel::System::CR::Dev::ACL');
 
 =cut
 
@@ -54,63 +54,6 @@ sub new {
 
     return $Self;
 }
-
-# =item TypeDelete()
-
-# Deletes a ticket type from DB
-
-#     my $Success = $DevTypeObject->TypeDelete(
-#         TypeID => 123,                      # TypeID or Type is requiered
-#         Type   => 'Some type',
-#     );
-
-# Returns:
-#     $Sucesss = 1;                           # or false if there was any error.
-
-# =cut
-
-# sub TypeDelete {
-#     my ( $Self, %Param ) = @_;
-
-#     # check needed stuff
-#     if ( !$Param{Type} && !$Param{TypeID} ) {
-#         $Kernel::OM->Get('Kernel::System::Log')->Log(
-#             Priority => 'error',
-#             Message  => 'Need User or UserID!'
-#         );
-#         return;
-#     }
-
-#     # set TypeID
-#     my $TypeID = $Param{TypeID} || '';
-#     if ( !$TypeID ) {
-#         my $TypeID = $Kernel::OM->Get('Kernel::System::Type')->TypeLookup(
-#             Type => $Param{Type},
-#         );
-#     }
-#     if ( !$TypeID ) {
-#         $Kernel::OM->Get('Kernel::System::Log')->Log(
-#             Priority => 'error',
-#             Message  => 'Type is invalid!'
-#         );
-#         return;
-#     }
-
-#     # delete type from DB
-#     return if !$Kernel::OM->Get('Kernel::System::DB')->Do(
-#         SQL => "
-#             DELETE FROM ticket_type
-#             WHERE id = ?",
-#         Bind  => [ \$TypeID ],
-#         Limit => 1,
-#     );
-
-#     # delete cache
-#     $Kernel::OM->Get('Kernel::System::Cache')->CleanUp(
-#         Type => 'Type',
-#     );
-#     return 1;
-# }
 
 =item ACLSearch()
 
