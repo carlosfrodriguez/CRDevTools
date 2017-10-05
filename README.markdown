@@ -25,13 +25,13 @@ Use parameter --help to get more information on the options and general usage of
 
   Delete customer users from DB, also removes relations from **_&lt;CustomerUser Preferences Table&gt;_**
 
-  TODO: Delete group relations
+  **TODO: Delete group relations**
 
 * CR::Dev::Group::Delete:
 
   Delete groups from DB, also removes relations from _group_user_ and _group_role_.
 
-  TODO: Delete CustomerUser relations
+  **TODO: Delete CustomerUser relations**
 
 * CR::Dev::Priority::Delete:
 
