@@ -120,7 +120,7 @@ sub Run {
     my $ACLDump = $ACLObject->ACLDump(
         ResultType => 'FILE',
         Location   => $Location,
-        UserID     => $Self->{UserID},
+        UserID     => 1,
     );
 
     if ($ACLDump) {
