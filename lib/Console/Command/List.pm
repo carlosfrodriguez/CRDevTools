@@ -20,6 +20,10 @@ use System;
 
 use parent qw(Console::BaseCommand);
 
+our @ObjectDependencies = (
+    'System',
+);
+
 sub Configure {
     my ( $Self, %Param ) = @_;
 
@@ -50,8 +54,10 @@ sub Run {
 
     COMMAND:
     for my $Command ( $Self->ListAllCommands() ) {
-        my $CommandObject = System::ObjectInstanceCreate($Command);
-        my $CommandName   = $CommandObject->Name();
+        no warnings 'once';    ## no critic
+        my $CommandObject = $Kernel::OM->Get('System')->ObjectInstanceCreate( $Command, Silent => 1 );
+
+        my $CommandName = $CommandObject->Name();
 
         # Group by toplevel namespace
         my ($CommandNamespace) = $CommandName =~ m/^([^:]+)::/smx;
@@ -87,6 +93,7 @@ sub ListAllCommands {
         next COMMAND_FILE if ( $CommandFile =~ m{/Internal/}xms );
         $CommandFile =~ s{^.*/lib/(.*)[.]pm$}{$1}xmsg;
         $CommandFile =~ s{/+}{::}xmsg;
+
         push @Commands, $CommandFile;
     }
 
