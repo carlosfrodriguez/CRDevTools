@@ -37,6 +37,10 @@ Use parameter --help to get more information on the options and general usage of
 
   **TODO: Delete group relations**
 
+* Dev::DynamicField::Delete:
+
+  Delete dynamic fields from DB, also removes field values.
+
 * Dev::Group::Delete:
 
   Delete groups from DB, also removes relations from _group_user_ and _group_role_.
@@ -90,6 +94,10 @@ Use parameter --help to get more information on the options and general usage of
   **Warning:** As many tables are related to **_&lt;User Table&gt;_** before try to delete any user it is necessary to check if is not referenced by any other table.
 
 ### Search Tools:
+* Dev::DynamicField::Search
+
+  Search dynamic field by name.
+
 * Dev::Ticket::Search
 
   Search tickets by number, title customer owner or full-text (from to cc subject body).
