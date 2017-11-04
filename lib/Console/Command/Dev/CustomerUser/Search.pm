@@ -72,6 +72,7 @@ sub Run {
         $SearchOptions{Search} = $Self->GetOption('full-text');
     }
 
+    no warnings 'once';    ## no critic
     my $CustomerUserObject = $Kernel::OM->Get('Kernel::System::CustomerUser');
 
     if (%SearchOptions) {
