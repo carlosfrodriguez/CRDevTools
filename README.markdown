@@ -14,7 +14,7 @@ e.g.
 
 Git alias
 ```
-devtools = !~/Dev/CR/CRDevTools/bin/cr.DevTools.pl
+devtools = !/opt/CRDevTools/bin/cr.DevTools.pl
 ```
 e.g.
 
