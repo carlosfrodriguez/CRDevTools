@@ -15,7 +15,7 @@ package Console::Command::Dev::Priority::Delete;
 use strict;
 use warnings;
 
-use parent qw(Kernel::System::Console::BaseCommand);
+use parent qw(Console::BaseCommand);
 
 our @ObjectDependencies = (
     'Dev::Priority',
