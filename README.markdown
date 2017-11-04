@@ -94,15 +94,56 @@ Use parameter --help to get more information on the options and general usage of
   **Warning:** As many tables are related to **_&lt;User Table&gt;_** before try to delete any user it is necessary to check if is not referenced by any other table.
 
 ### Search Tools:
+* Dev::ACL::Search
+
+  Search ACLs by name.
+
+* Dev::CustomerUser::Search
+
+  Search customer users by login email or full-text (login first_name last_name).
+
 * Dev::DynamicField::Search
 
-  Search dynamic field by name.
+  Search dynamic fields by name.
+
+* Dev::Group::Search
+
+  Search groups by name.
+
+* Dev::Priority::Search
+
+  Search priorities by name.
+
+* Dev::Process::Search
+
+  Search processes by name.
+
+* Dev::Queue::Search
+
+  Search queues by name.
+
+* Dev::Service::Search
+
+  Search services by name.
+
+* Dev::State::Search
+
+  Search states by name.
 
 * Dev::Ticket::Search
 
   Search tickets by number, title customer owner or full-text (from to cc subject body).
 
-### General Tools:
+* Dev::Type::Search
+
+  Search ticket types by name.
+
+* Dev::User::Search
+
+  Search users by login email or full-text (login first_name last_name).
+
+
+### General Tools (deprecated):
 
 * cr.DevProcessManagement:
 
