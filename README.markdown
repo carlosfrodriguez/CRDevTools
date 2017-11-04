@@ -9,7 +9,7 @@ bin/cr.DevTools.pl Dev::<Object>::<Tool>
 e.g.
 
 ```perl
-\/opt/CRDevTools/bin/cr.DevTools.pl Dev::ACL::Delete
+/opt/CRDevTools/bin/cr.DevTools.pl Dev::ACL::Delete
 ```
 
 
