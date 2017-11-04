@@ -504,7 +504,7 @@ sub GetUsageHelp {
 
     my $UsageText = "<green>$Self->{Description}</green>\n";
     $UsageText .= "\n<yellow>Usage:</yellow>\n";
-    $UsageText .= " otrs.ModuleTools.pl $Self->{Name}";
+    $UsageText .= " cr.DevTools.pl $Self->{Name}";
 
     my $OptionsText   = "<yellow>Options:</yellow>\n";
     my $ArgumentsText = "<yellow>Arguments:</yellow>\n";
