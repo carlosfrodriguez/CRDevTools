@@ -8,10 +8,19 @@ bin/cr.DevTools.pl Dev::<Object>::<Tool>
 ```
 e.g.
 
-```perl
+```sh
 /opt/CRDevTools/bin/cr.DevTools.pl Dev::ACL::Delete
 ```
 
+Git alias
+```
+devtools = !~/Dev/CR/CRDevTools/bin/cr.DevTools.pl
+```
+e.g.
+
+```sh
+git devtools Dev::ACL::Search
+```
 
 Use parameter --help to get more information on the options and general usage of each tool.
 
