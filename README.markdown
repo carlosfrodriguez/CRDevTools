@@ -160,6 +160,6 @@ Use parameter --help to get more information on the options and general usage of
    Generate tickets for available processes using a random process and a random activity.
 
 #### Note:
-This package is not intended to be use on production systems, please be aware of potential data lost.
+This package is not intended to be used on production systems, please be aware of potential data lost.
 
 Use it carefully and at your own risk, data deleted by included tools might be unrecoverable!
