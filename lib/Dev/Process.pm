@@ -436,54 +436,6 @@ sub ProcessImportRaw {
     );
 }
 
-sub ProcessTicketDeleteAll {
-    my ( $Self, %Param ) = @_;
-
-    my $ProcessIDDF = $Kernel::OM->Get('Kernel::Config')->Get('Process::DynamicFieldProcessManagementProcessID');
-
-    # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
-
-    # search all tickets
-    my @TicketIDs = $TicketObject->TicketSearch(
-        Result                      => 'ARRAY',
-        UserID                      => 1,
-        SortBy                      => 'Age',
-        OrderBy                     => 'Up',
-        ContentSearch               => 'OR',
-        FullTextIndex               => 1,
-        "DynamicField_$ProcessIDDF" => {
-            Like => '****',
-        },
-    );
-
-    TICKETID:
-    for my $TicketID (@TicketIDs) {
-
-        next TICKETID if !$TicketID;
-
-        next TICKETID if $TicketID eq 1 && $Param{ExceptWelcome};
-
-        # get ticket details
-        my %Ticket = $TicketObject->TicketGet(
-            TicketID => $TicketID,
-            UserID   => 1,
-        );
-
-        # check if ticket exists
-        next TICKETID if ( !%Ticket );
-
-        # delete ticket
-        my $Success = $TicketObject->TicketDelete(
-            TicketID => $TicketID,
-            UserID   => 1,
-        );
-
-        return if !$Success;
-    }
-    return 1;
-}
-
 sub GenerateProcessTicket {
     my ( $Self, %Param ) = @_;
 

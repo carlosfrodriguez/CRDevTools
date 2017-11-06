@@ -57,6 +57,10 @@ Use parameter --help to get more information on the options and general usage of
 
   Delete processes from DB, also generates an process deployment to sync ZZZProcessManagement.pm file.
 
+* Dev::Process::DeleteTickets:
+
+  Delete processes tickets from DB.
+
 * Dev::Queue::Delete:
 
   Delete queues from DB, also removes relations from _personal_queues_, _queue_auto_response_, _queue_perferences_ and _queue_standard_template_.
@@ -143,17 +147,15 @@ Use parameter --help to get more information on the options and general usage of
   Search users by login email or full-text (login first_name last_name).
 
 
-### General Tools (deprecated):
+### General Tools:
 
-* cr.DevProcessManagement:
+* Dev::Process::Deploy
+
+  Deploy all processes into Kernel/Config/Files/ZZZProcessManagement.pm
+
+* cr.DevProcessManagement: (deprecated)
 
    Import processes without changing the entity ID (raw import).
-
-   Deletes all process Tickets from the DB.
-
-   Deletes all processes from DB.
-
-   Deploy processes.
 
    Generate tickets for available processes using a random process and a random activity.
 
