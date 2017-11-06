@@ -3,13 +3,13 @@
 ## Development Tools for OTRS
 From now on this tools are does not depends on the otrs.Console.pl, and does not need to be linked, but they must be called from an OTRS framework directory:
 
-```perl
+```sh
 bin/cr.DevTools.pl Dev::<Object>::<Tool>
 ```
 e.g.
 
 ```sh
-/opt/CRDevTools/bin/cr.DevTools.pl Dev::ACL::Delete
+~<OTRSHOME>$ /opt/CRDevTools/bin/cr.DevTools.pl Dev::ACL::Delete
 ```
 
 Git alias
@@ -19,7 +19,7 @@ devtools = !/opt/CRDevTools/bin/cr.DevTools.pl
 e.g.
 
 ```sh
-git devtools Dev::ACL::Search
+~<OTRSHOME>$ git devtools Dev::ACL::Search
 ```
 
 Use parameter --help to get more information on the options and general usage of each tool.
