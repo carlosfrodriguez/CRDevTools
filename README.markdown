@@ -1,11 +1,13 @@
 # CRDevTools
 
 ## Development Tools for OTRS
+
 From now on this tools are does not depends on the otrs.Console.pl, and does not need to be linked, but they must be called from an OTRS framework directory:
 
 ```sh
 bin/cr.DevTools.pl Dev::<Object>::<Tool>
 ```
+
 e.g.
 
 ```sh
@@ -13,9 +15,11 @@ e.g.
 ```
 
 Git alias
-```
+
+```sh
 devtools = !/opt/CRDevTools/bin/cr.DevTools.pl
 ```
+
 e.g.
 
 ```sh
@@ -24,9 +28,10 @@ e.g.
 
 Use parameter --help to get more information on the options and general usage of each tool.
 
-## Included Tools:
+## Included Tools
 
-### Delete Tools:
+### Delete Tools
+
 * Dev::ACL::Delete:
 
   Delete ACLs from DB, also generates an ACL deployment to sync ZZZACL.pm file.
@@ -63,7 +68,7 @@ Use parameter --help to get more information on the options and general usage of
 
 * Dev::Queue::Delete:
 
-  Delete queues from DB, also removes relations from _personal_queues_, _queue_auto_response_, _queue_perferences_ and _queue_standard_template_.
+  Delete queues from DB, also removes relations from _personal_queues_, _queue_auto_response_, _queue_preferences_ and _queue_standard_template_.
 
   Can delete associated tickets.
 
@@ -97,7 +102,8 @@ Use parameter --help to get more information on the options and general usage of
 
   **Warning:** As many tables are related to **_&lt;User Table&gt;_** before try to delete any user it is necessary to check if is not referenced by any other table.
 
-### Search Tools:
+### Search Tools
+
 * Dev::ACL::Search
 
   Search ACLs by name.
@@ -146,8 +152,7 @@ Use parameter --help to get more information on the options and general usage of
 
   Search users by login email or full-text (login first_name last_name).
 
-
-### General Tools:
+### General Tools
 
 * Dev::Process::Deploy
 
@@ -159,7 +164,8 @@ Use parameter --help to get more information on the options and general usage of
 
    Generate tickets for available processes using a random process and a random activity.
 
-#### Note:
+#### Note
+
 This package is not intended to be used on production systems, please be aware of potential data lost.
 
 Use it carefully and at your own risk, data deleted by included tools might be unrecoverable!
