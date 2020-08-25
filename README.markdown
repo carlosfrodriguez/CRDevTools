@@ -44,6 +44,7 @@ Use parameter --help to get more information on the options and general usage of
   &nbsp;
 
 * Dev::CustomerCompany::Delete
+
   Delete customer companies from the DB
   &nbsp;
 
@@ -60,6 +61,7 @@ Use parameter --help to get more information on the options and general usage of
   &nbsp;
 
 * Dev::FAQ::Delete:
+
   Delete knowledge base articles from the DB
   &nbsp;
 
@@ -89,18 +91,22 @@ Use parameter --help to get more information on the options and general usage of
     &nbsp;
 
   * Dev::Process::Activity::Delete:
+
     Delete process activities from the DB.
     &nbsp;
 
   * Dev::Process::ActivityDialog::Delete:
+
     Delete process activity dialogs from the DB.
     &nbsp;
 
   * Dev::Process::SequenceFlow::Delete:
+
     Delete process sequence flows from the DB.
     &nbsp;
 
   * Dev::Process::SequenceFlowAction::Delete:
+
     Delete process sequence flow actions from the DB.
     &nbsp;
 
