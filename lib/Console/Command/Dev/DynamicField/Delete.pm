@@ -2,8 +2,8 @@
 # Copyright (C) 2017 Carlos Rodriguez, https://github.com/carlosfrodriguez
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 # DO NOT USE THIS FILE ON PRODUCTION SYSTEMS!
 #
@@ -20,7 +20,7 @@ use parent qw(Console::BaseCommand);
 our @ObjectDependencies = (
     'Kernel::Config',
     'Kernel::System::DynamicField',
-    'Kernel::System::DynamicField::Backend',
+    'Kernel::System::DynamicFieldValue',
 );
 
 sub Configure {
@@ -82,6 +82,7 @@ sub Run {
     }
 
     my $Failed;
+    my $DynamicFieldValueObject = $Kernel::OM->Get('Kernel::System::DynamicFieldValue');
 
     ITEMID:
     for my $ItemID (@ItemsToDelete) {
@@ -101,17 +102,21 @@ sub Run {
             next ITEMID;
         }
 
-        my $ValuesDeleteSuccess = $Kernel::OM->Get('Kernel::System::DynamicField::Backend')->AllValuesDelete(
-            DynamicFieldConfig => $Item,
-            UserID             => 1,
+        my $ValuesDeleteSuccess = $DynamicFieldValueObject->AllValuesDelete(
+            FieldID => $ItemID,
+            UserID  => 1,
         );
+        if ( !$ValuesDeleteSuccess ) {
+            $Self->PrintError("Can't delete all DynamicField $ItemID values!\n");
+            $Failed = 1;
+            next ITEMID;
+        }
 
-        # delete Type
+        # delete dynamic field
         my $Success = $DynamicFieldObject->DynamicFieldDelete(
             ID     => $ItemID,
             UserID => 1,
         );
-
         if ( !$Success ) {
             $Self->PrintError("Can't delete DynamicField $ItemID!\n");
             $Failed = 1;
@@ -132,13 +137,3 @@ sub Run {
 }
 
 1;
-
-=head1 TERMS AND CONDITIONS
-
-This software is a component of the CRDevTools project (L<https://github.com/carlosfrodriguez/CRDevTools/>).
-
-This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
-
-=cut
