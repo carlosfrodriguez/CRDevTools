@@ -2,15 +2,15 @@
 # Copyright (C) 2017 Carlos Rodriguez, https://github.com/carlosfrodriguez
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 # DO NOT USE THIS FILE ON PRODUCTION SYSTEMS!
 #
 # otrs is Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
 # --
 
-package Console::Command::Dev::Process::Search;
+package Console::Command::Dev::ProcessManagement::SequenceFlowAction::Search;
 
 use strict;
 use warnings;
@@ -19,17 +19,18 @@ use parent qw(Console::BaseCommand);
 
 our @ObjectDependencies = (
     'Dev::Process',
-    'Kernel::System::ProcessManagement::DB::Process',
+    'Dev::ProcessManagement::SequenceFlowAction',
+    'Kernel::System::ProcessManagement::DB::SequenceFlowAction',
 );
 
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Search Processes in the system.');
+    $Self->Description('Search Process Management Sequence Flow Actions in the system.');
 
     $Self->AddOption(
         Name        => 'name',
-        Description => "Search Processes with specified Process name e.g. *MyProcess*.",
+        Description => "Search Activities with specified SequenceFlowAction name e.g. *MySequenceFlowAction*.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -41,7 +42,7 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Listing Processes...</yellow>\n");
+    $Self->Print("<yellow>Listing Sequence Flow Actions...</yellow>\n");
 
     my %SearchOptions;
 
@@ -52,16 +53,16 @@ sub Run {
         $SearchOptions{UserLogin} = $Self->GetOption('name');
     }
 
-    my $ProcessObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Process');
+    my $SequenceFlowActionObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::SequenceFlowAction');
 
     if (%SearchOptions) {
 
-        %List = $Kernel::OM->Get('Dev::Process')->ProcessSearch(
+        %List = $Kernel::OM->Get('Dev::ProcessManagement::SequenceFlowAction')->SequenceFlowActionSearch(
             %SearchOptions,
         );
     }
     else {
-        %List = %{ $ProcessObject->ProcessList( UserID => 1 ) };
+        %List = %{ $SequenceFlowActionObject->SequenceFlowActionList( UserID => 1 ) };
     }
 
     my @ItemIDs = sort { $a cmp $b } keys %List;
@@ -75,18 +76,18 @@ sub Run {
         next ITEM if !$ItemID;
 
         # get item details
-        my $Item = $ProcessObject->ProcessGet(
+        my $Item = $SequenceFlowActionObject->SequenceFlowActionGet(
             ID     => $ItemID,
             UserID => 1,
         );
         next ITEM if !$Item;
 
         # store item details
-        push @Items, $Item,
+        push @Items, $Item,;
     }
 
     if ( !@Items ) {
-        $Self->Print("No Processes found\n");
+        $Self->Print("No Sequence Flow Actions found\n");
 
         $Self->Print("<green>Done.</green>\n");
         return $Self->ExitCodeOk();
@@ -107,13 +108,3 @@ sub Run {
 }
 
 1;
-
-=head1 TERMS AND CONDITIONS
-
-This software is a component of the CRDevTools project (L<https://github.com/carlosfrodriguez/CRDevTools/>).
-
-This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
-
-=cut

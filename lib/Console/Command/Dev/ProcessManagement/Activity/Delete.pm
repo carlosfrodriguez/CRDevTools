@@ -2,15 +2,15 @@
 # Copyright (C) 2017 Carlos Rodriguez, https://github.com/carlosfrodriguez
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 # DO NOT USE THIS FILE ON PRODUCTION SYSTEMS!
 #
 # otrs is Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
 # --
 
-package Console::Command::Dev::Process::Delete;
+package Console::Command::Dev::ProcessManagement::Activity::Delete;
 
 use strict;
 use warnings;
@@ -19,16 +19,16 @@ use parent qw(Console::BaseCommand);
 
 our @ObjectDependencies = (
     'Dev::Process',
-    'Kernel::System::ProcessManagement::DB::Process',
+    'Kernel::System::ProcessManagement::DB::Activity',
 );
 
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Delete one or more Processes.');
+    $Self->Description('Delete one or more Activities.');
     $Self->AddOption(
         Name        => 'id',
-        Description => "Specify one or more Process ids of Processes to be deleted.",
+        Description => "Specify one or more Activity ids of Activities to be deleted.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/\d+/smx,
@@ -36,19 +36,11 @@ sub Configure {
     );
     $Self->AddOption(
         Name        => 'id-range',
-        Description => "Specify a range of Process ids to be deleted. (e.g. 1..10)",
+        Description => "Specify a range of Activity ids to be deleted. (e.g. 1..10)",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/\d+\.\.\d+/smx,
         Multiple    => 0,
-    );
-    $Self->AddOption(
-        Name        => 'all',
-        Description => "Deletes all Processes.",
-        Required    => 0,
-        HasValue    => 1,
-        ValueRegex  => qr/.*/smx,
-        Multiple    => 1,
     );
 
     return;
@@ -74,26 +66,9 @@ sub PreRun {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Deleting Processes...</yellow>\n");
+    $Self->Print("<yellow>Deleting Activities...</yellow>\n");
 
-    my $ProcessObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Process');
-
-    my $DevProcessObject = $Kernel::OM->Get('Dev::Process');
-
-    if ( $Self->GetOption('all') ) {
-
-        $Self->Print("Set to delete all processes!\n");
-
-        my $Success = $DevProcessObject->ProcessRemoveAll();
-
-        if ( !$Success ) {
-            $Self->PrintError("Not all Processes where deleted\n");
-            return $Self->ExitCodeError();
-        }
-
-        $Self->Print("<green>Done.</green>\n");
-        return $Self->ExitCodeOk();
-    }
+    my $ActivityObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Activity');
 
     my @ItemsToDelete;
     if ( $Self->GetOption('id') ) {
@@ -113,34 +88,34 @@ sub Run {
         next ITEMID if !$ItemID;
 
         # get item details
-        my $Item = $ProcessObject->ProcessGet(
+        my $Item = $ActivityObject->ActivityGet(
             ID     => $ItemID,
             UserID => 1,
         );
 
         # check if item exists
         if ( !$Item ) {
-            $Self->PrintError("The Process with ID $ItemID does not exist!\n");
+            $Self->PrintError("The Activity with ID $ItemID does not exist!\n");
             $Failed = 1;
             next ITEMID;
         }
 
         # delete Type
-        my $Success = $ProcessObject->ProcessDelete(
+        my $Success = $ActivityObject->ActivityDelete(
             ID     => $ItemID,
             UserID => 1,
         );
 
         if ( !$Success ) {
-            $Self->PrintError("Can't delete Process $ItemID!\n");
+            $Self->PrintError("Can't delete Activity $ItemID!\n");
             $Failed = 1;
             next ITEMID;
         }
 
-        $Self->Print("  Deleted Process <yellow>$ItemID</yellow>\n");
+        $Self->Print("  Deleted Activity <yellow>$ItemID</yellow>\n");
     }
 
-    my $Result = $DevProcessObject->ProcessDeploy();
+    my $Result = $Kernel::OM->Get('Dev::Process')->ProcessDeploy();
 
     if ( !$Result || !$Result->{Success} ) {
         $Self->PrintError("There was an error synchronizing the Processes.");
@@ -150,7 +125,7 @@ sub Run {
     }
 
     if ($Failed) {
-        $Self->PrintError("Not all Processs where deleted\n");
+        $Self->PrintError("Not all Activities where deleted\n");
         return $Self->ExitCodeError();
     }
 
@@ -160,13 +135,3 @@ sub Run {
 }
 
 1;
-
-=head1 TERMS AND CONDITIONS
-
-This software is a component of the CRDevTools project (L<https://github.com/carlosfrodriguez/CRDevTools/>).
-
-This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
-
-=cut
