@@ -2,8 +2,8 @@
 # Copyright (C) 2017 Carlos Rodriguez, https://github.com/carlosfrodriguez
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Dev::Process;
@@ -23,8 +23,8 @@ our @ObjectDependencies = (
     'Kernel::System::ProcessManagement::DB::ActivityDialog',
     'Kernel::System::ProcessManagement::DB::Entity',
     'Kernel::System::ProcessManagement::DB::Process',
-    'Kernel::System::ProcessManagement::DB::Transition',
-    'Kernel::System::ProcessManagement::DB::TransitionAction',
+    'Kernel::System::ProcessManagement::DB::SequenceFlow',
+    'Kernel::System::ProcessManagement::DB::SequenceFlowAction',
     'Kernel::System::ProcessManagement::Process',
     'Kernel::System::Ticket',
     'Kernel::System::YAML',
@@ -70,13 +70,14 @@ sub ProcessRemoveAll {
     my %CommonObject;
 
     # build common objects
-    $CommonObject{ActivityObject}         = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Activity');
-    $CommonObject{ActivityDialogObject}   = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::ActivityDialog');
-    $CommonObject{TransitionActionObject} = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::TransitionAction');
-    $CommonObject{TransitionObject}       = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Transition');
-    $CommonObject{ProcessObject}          = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Process');
+    $CommonObject{ActivityObject}       = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Activity');
+    $CommonObject{ActivityDialogObject} = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::ActivityDialog');
+    $CommonObject{SequenceFlowActionObject}
+        = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::SequenceFlowAction');
+    $CommonObject{SequenceFlowObject} = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::SequenceFlow');
+    $CommonObject{ProcessObject}      = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Process');
 
-    for my $ProcessPart (qw(Process Activity ActivityDialog Transition TransitionAction)) {
+    for my $ProcessPart (qw(Process Activity ActivityDialog SequenceFlow SequenceFlowAction)) {
         my $ListFunction = $ProcessPart . 'List';
         my $PartList     = $CommonObject{ $ProcessPart . 'Object' }->$ListFunction(
             UserID => 1,
@@ -101,16 +102,17 @@ sub ProcessImportRaw {
     my %CommonObject;
 
     # build common objects
-    $CommonObject{YAMLObject}             = $Kernel::OM->Get('Kernel::System::YAML');
-    $CommonObject{ActivityObject}         = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Activity');
-    $CommonObject{ActivityDialogObject}   = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::ActivityDialog');
-    $CommonObject{TransitionActionObject} = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::TransitionAction');
-    $CommonObject{TransitionObject}       = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Transition');
-    $CommonObject{DynamicFieldObject}     = $Kernel::OM->Get('Kernel::System::DynamicField');
-    $CommonObject{BackendObject}          = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
-    $CommonObject{ProcessObject}          = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Process');
-    $CommonObject{EntityObject}           = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Entity');
-    $CommonObject{LogObject}              = $Kernel::OM->Get('Kernel::System::Log');
+    $CommonObject{YAMLObject}           = $Kernel::OM->Get('Kernel::System::YAML');
+    $CommonObject{ActivityObject}       = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Activity');
+    $CommonObject{ActivityDialogObject} = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::ActivityDialog');
+    $CommonObject{SequenceFlowActionObject}
+        = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::SequenceFlowAction');
+    $CommonObject{SequenceFlowObject} = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::SequenceFlow');
+    $CommonObject{DynamicFieldObject} = $Kernel::OM->Get('Kernel::System::DynamicField');
+    $CommonObject{BackendObject}      = $Kernel::OM->Get('Kernel::System::DynamicField::Backend');
+    $CommonObject{ProcessObject}      = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Process');
+    $CommonObject{EntityObject}       = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Entity');
+    $CommonObject{LogObject}          = $Kernel::OM->Get('Kernel::System::Log');
 
     for my $Needed (qw(Content UserID)) {
 
@@ -210,42 +212,42 @@ sub ProcessImportRaw {
         }
     }
 
-    # make sure all transitions are present
-    for my $TransitionEntityID ( @{ $ProcessData->{Process}->{Transitions} } ) {
-        if ( ref $ProcessData->{Transitions}->{$TransitionEntityID} ne 'HASH' ) {
+    # make sure all sequence flows are present
+    for my $SequenceFlowsEntityID ( @{ $ProcessData->{Process}->{SequenceFlows} } ) {
+        if ( ref $ProcessData->{SequenceFlows}->{$SequenceFlowsEntityID} ne 'HASH' ) {
             return (
-                Message => "Missing data for Transition $TransitionEntityID.",
+                Message => "Missing data for SequenceFlows $SequenceFlowsEntityID.",
             );
         }
     }
 
-    # make sure all transition actions are present
-    for my $TransitionActionEntityID ( @{ $ProcessData->{Process}->{TransitionActions} } ) {
-        if ( ref $ProcessData->{TransitionActions}->{$TransitionActionEntityID} ne 'HASH' ) {
+    # make sure all sequence flows actions are present
+    for my $SequenceFlowActionEntityID ( @{ $ProcessData->{Process}->{SequenceFlowActions} } ) {
+        if ( ref $ProcessData->{SequenceFlowActions}->{$SequenceFlowActionEntityID} ne 'HASH' ) {
             return (
-                Message => "Missing data for TransitionAction $TransitionActionEntityID.",
+                Message => "Missing data for Sequence Flow Action $SequenceFlowActionEntityID.",
             );
         }
     }
 
     my %EntityMapping;
     my %PartNameMap = (
-        Activity         => 'Activities',
-        ActivityDialog   => 'ActivityDialogs',
-        Transition       => 'Transitions',
-        TransitionAction => 'TransitionActions'
+        Activity           => 'Activities',
+        ActivityDialog     => 'ActivityDialogs',
+        SequenceFlows      => 'SequenceFlows',
+        SequenceFlowAction => 'SequenceFlowActions'
     );
 
     # keep entities
     $EntityMapping{Process}->{ $ProcessData->{Process}->{EntityID} } = $ProcessData->{Process}->{EntityID};
 
-    for my $PartName (qw(Activity ActivityDialog Transition TransitionAction)) {
+    for my $PartName (qw(Activity ActivityDialog SequenceFlow SequenceFlowAction)) {
         for my $PartEntityID ( sort keys %{ $ProcessData->{ $PartNameMap{$PartName} } } ) {
             $EntityMapping{ $PartNameMap{$PartName} }->{$PartEntityID} = $PartEntityID;
         }
 
         # make sure that all entity mapping parts are defined as hash references
-        $EntityMapping{ $PartNameMap{$PartName} } //= {}
+        $EntityMapping{ $PartNameMap{$PartName} } //= {};
     }
 
     # invert the entity mappings, this is needed as we need to check if the new entities exists:
@@ -254,11 +256,11 @@ sub ProcessImportRaw {
     #    to be created before it is updated
     # if new entities are to be created they will be using minimal data and updated with real data
     #    later, this way overwriting and non overwriting processes will share the same logic
-    %{ $EntityMapping{Process} }           = reverse %{ $EntityMapping{Process} };
-    %{ $EntityMapping{Activities} }        = reverse %{ $EntityMapping{Activities} };
-    %{ $EntityMapping{ActivityDialogs} }   = reverse %{ $EntityMapping{ActivityDialogs} };
-    %{ $EntityMapping{Transitions} }       = reverse %{ $EntityMapping{Transitions} };
-    %{ $EntityMapping{TransitionActions} } = reverse %{ $EntityMapping{TransitionActions} };
+    %{ $EntityMapping{Process} }             = reverse %{ $EntityMapping{Process} };
+    %{ $EntityMapping{Activities} }          = reverse %{ $EntityMapping{Activities} };
+    %{ $EntityMapping{ActivityDialogs} }     = reverse %{ $EntityMapping{ActivityDialogs} };
+    %{ $EntityMapping{SequenceFlows} }       = reverse %{ $EntityMapping{SequenceFlows} };
+    %{ $EntityMapping{SequenceFlowActions} } = reverse %{ $EntityMapping{SequenceFlowActions} };
 
     my %AddedEntityIDs;
 
@@ -306,17 +308,17 @@ sub ProcessImportRaw {
             Fields           => {},
             FieldOrder       => [],
         },
-        Transition => {
+        SequenceFlow => {
             Condition => {},
         },
-        TransitionAction => {
-            Module => 'NewTransitionAction',
+        SequenceFlowAction => {
+            Module => 'NewSequenceFlowAction',
             Config => {},
         },
     );
 
     # create missing process parts
-    for my $PartName (qw(Activity ActivityDialog Transition TransitionAction)) {
+    for my $PartName (qw(Activity ActivityDialog SequenceFlow SequenceFlowAction)) {
 
         my $PartListFunction = $PartName . 'List';
         my $PartAddFunction  = $PartName . 'Add';
@@ -372,11 +374,11 @@ sub ProcessImportRaw {
     $ProcessData = $UpdateResult->{ProcessData};
 
     # invert the entity mappings again for easy lookup as keys:
-    %{ $EntityMapping{Process} }           = reverse %{ $EntityMapping{Process} };
-    %{ $EntityMapping{Activities} }        = reverse %{ $EntityMapping{Activities} };
-    %{ $EntityMapping{ActivityDialogs} }   = reverse %{ $EntityMapping{ActivityDialogs} };
-    %{ $EntityMapping{Transitions} }       = reverse %{ $EntityMapping{Transitions} };
-    %{ $EntityMapping{TransitionActions} } = reverse %{ $EntityMapping{TransitionActions} };
+    %{ $EntityMapping{Process} }             = reverse %{ $EntityMapping{Process} };
+    %{ $EntityMapping{Activities} }          = reverse %{ $EntityMapping{Activities} };
+    %{ $EntityMapping{ActivityDialogs} }     = reverse %{ $EntityMapping{ActivityDialogs} };
+    %{ $EntityMapping{SequenceFlows} }       = reverse %{ $EntityMapping{SequenceFlows} };
+    %{ $EntityMapping{SequenceFlowActions} } = reverse %{ $EntityMapping{SequenceFlowActions} };
 
     # update all entities with real data
     # update process
@@ -401,7 +403,7 @@ sub ProcessImportRaw {
     }
 
     # update all other process parts
-    for my $PartName (qw(Activity ActivityDialog Transition TransitionAction)) {
+    for my $PartName (qw(Activity ActivityDialog SequenceFlow SequenceFlowAction)) {
 
         my $PartGetFunction    = $PartName . 'Get';
         my $PartUpdateFunction = $PartName . 'Update';
@@ -598,13 +600,3 @@ sub ProcessSearch {
 1;
 
 =back
-
-=head1 TERMS AND CONDITIONS
-
-This software is is a component of the CRDevTools project (L<https://github.com/carlosfrodriguez/CRDevTools/>).
-
-This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
-
-=cut
