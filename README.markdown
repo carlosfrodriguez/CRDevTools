@@ -14,9 +14,9 @@ e.g.
 ~<OTRSHOME>$ /opt/CRDevTools/bin/cr.DevTools.pl Dev::ACL::Delete
 ```
 
-Git alias
+or with a git alias like:
 
-```sh
+```apacheconf
 devtools = !/opt/CRDevTools/bin/cr.DevTools.pl
 ```
 
@@ -35,72 +35,112 @@ Use parameter --help to get more information on the options and general usage of
 * Dev::ACL::Delete:
 
   Delete ACLs from DB, also generates an ACL deployment to sync ZZZACL.pm file.
+  &nbsp;
+
+* Dev::ChatChannel::Delete:
+
+  Delete chat channels from the DB
+  Can delete associated chat messages
+  &nbsp;
+
+* Dev::CustomerCompany::Delete
+  Delete customer companies from the DB
+  &nbsp;
 
 * Dev::CustomerUser::Delete:
 
   Delete customer users from DB, also removes relations from **_&lt;CustomerUser Preferences Table&gt;_**
 
   **TODO: Delete group relations**
+  &nbsp;
 
 * Dev::DynamicField::Delete:
 
   Delete dynamic fields from DB, also removes field values.
+  &nbsp;
+
+* Dev::FAQ::Delete:
+  Delete knowledge base articles from the DB
+  &nbsp;
 
 * Dev::Group::Delete:
 
-  Delete groups from DB, also removes relations from _group_user_ and _group_role_.
+  Delete groups from DB, also removes relations from *group_user* and *group_role*.
 
   **TODO: Delete CustomerUser relations**
+  &nbsp;
 
 * Dev::Priority::Delete:
 
   Delete ticket priorities from DB.
-
   Can delete associated tickets.
+  &nbsp;
 
-* Dev::Process::Delete:
+* Dev::Process
 
-  Delete processes from DB, also generates an process deployment to sync ZZZProcessManagement.pm file.
+  * Dev::Process::Delete:
 
-* Dev::Process::DeleteTickets:
+    Delete processes from DB, also generates an process deployment to sync ZZZProcessManagement.pm file.
+    &nbsp;
 
-  Delete processes tickets from DB.
+  * Dev::Process::DeleteTickets:
+
+    Delete process tickets from DB.
+    &nbsp;
+
+  * Dev::Process::Activity::Delete:
+    Delete process activities from the DB.
+    &nbsp;
+
+  * Dev::Process::ActivityDialog::Delete:
+    Delete process activity dialogs from the DB.
+    &nbsp;
+
+  * Dev::Process::SequenceFlow::Delete:
+    Delete process sequence flows from the DB.
+    &nbsp;
+
+  * Dev::Process::SequenceFlowAction::Delete:
+    Delete process sequence flow actions from the DB.
+    &nbsp;
 
 * Dev::Queue::Delete:
 
-  Delete queues from DB, also removes relations from _personal_queues_, _queue_auto_response_, _queue_preferences_ and _queue_standard_template_.
+  Delete queues from DB, also removes relations from *personal_queues*, *queue_auto_response*, *queue_preferences* and *queue_standard_template*.
 
   Can delete associated tickets.
-
+  &nbsp;
+]
 * Dev::Service::Delete:
 
-  Delete services from DB, also removes relations from _service_customer_user_, _service_preferences_, _service_sla_ and _personal_services_.
-
+  Delete services from DB, also removes relations from *service_customer_user*, *service_preferences*, *service_sla* and *personal_services*.
   Can delete associated tickets.
+  &nbsp;
 
 * Dev::State::Delete:
 
   Delete ticket states from DB.
-
   Can delete associated tickets.
+  &nbsp;
 
 * Dev::Ticket::Delete:
 
-   Delete tickets from DB, including Articles and History (using OTRS API).
-
-   Can delete all tickets at once (leaving initial ticket).
+  Delete tickets from DB, including Articles and History (using OTRS API).
+  Can delete all tickets at once (leaving initial ticket).
+  &nbsp;
 
 * Dev::Type::Delete:
 
    Delete ticket types from the DB.
-
    Can delete associated tickets.
+  &nbsp;
 
 * Dev::User::Delete:
 
-  Delete users from DB, also removes relations from _group_user_, _role_user_, _article_fag_, _ticket_history_ and **_&lt;User Preferences Table&gt;_**
-
+  Delete users from DB, also removes relations from
+  *group_user*, *role_user*, *article_fag*, *ticket_history* and **_&lt;User Preferences Table&gt;_**
   **Warning:** As many tables are related to **_&lt;User Table&gt;_** before try to delete any user it is necessary to check if is not referenced by any other table.
+  &nbsp;
 
 ### Search Tools
 
