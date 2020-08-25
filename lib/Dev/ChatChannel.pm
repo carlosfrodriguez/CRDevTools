@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2017 Carlos Rodriguez, https://github.com/carlosfrodriguez
+# Copyright (C) 2020 Carlos Rodriguez, https://github.com/carlosfrodriguez
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
