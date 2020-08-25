@@ -2,8 +2,8 @@
 # Copyright (C) 2017 Carlos Rodriguez, https://github.com/carlosfrodriguez
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 # DO NOT USE THIS FILE ON PRODUCTION SYSTEMS!
 #
@@ -80,12 +80,14 @@ sub Run {
         %List = $CustomerUserObject->CustomerSearch(
             %SearchOptions,
             Valid => 0,
+            Limit => 10_000,
         );
     }
     else {
         %List = $CustomerUserObject->CustomerSearch(
             Search => '**',
             Valid  => 0,
+            Limit  => 10_000,
         );
     }
 
@@ -110,7 +112,7 @@ sub Run {
         $Item{Email} = $Item{UserEmail} || '';
 
         # store item details
-        push @Items, \%Item,
+        push @Items, \%Item,;
     }
 
     if ( !@Items ) {
@@ -134,13 +136,3 @@ sub Run {
 }
 
 1;
-
-=head1 TERMS AND CONDITIONS
-
-This software is a component of the CRDevTools project (L<https://github.com/carlosfrodriguez/CRDevTools/>).
-
-This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
-
-=cut
