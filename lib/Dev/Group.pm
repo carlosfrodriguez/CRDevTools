@@ -2,8 +2,8 @@
 # Copyright (C) 2017 Carlos Rodriguez, https://github.com/carlosfrodriguez
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
-# the enclosed file COPYING for license information (AGPL). If you
-# did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
+# the enclosed file COPYING for license information (GPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
 package Dev::Group;
@@ -14,6 +14,7 @@ use warnings;
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = (
+    'Kernel::Config',
     'Kernel::System::DB',
     'Kernel::System::Cache',
     'Kernel::System::Group',
@@ -128,10 +129,17 @@ sub GroupDelete {
         Limit => 1,
     );
 
+    my $GroupTable = 'group';
+    my $Version    = $Kernel::OM->Get('Kernel::Config')->Get('Version');
+    $Version = substr $Version, 0, 1;
+    if ( $Version >= 7 ) {
+        $GroupTable = 'groups_table';
+    }
+
     # delete Group from DB
     return if !$DBObject->Do(
         SQL => "
-            DELETE FROM groups
+            DELETE FROM $GroupTable
             WHERE id = ?",
         Bind  => [ \$GroupID ],
         Limit => 1,
@@ -229,13 +237,3 @@ sub GroupSearch {
 1;
 
 =back
-
-=head1 TERMS AND CONDITIONS
-
-This software is is a component of the CRDevTools project (L<https://github.com/carlosfrodriguez/CRDevTools/>).
-
-This software comes with ABSOLUTELY NO WARRANTY. For details, see
-the enclosed file COPYING for license information (AGPL). If you
-did not receive this file, see L<http://www.gnu.org/licenses/agpl.txt>.
-
-=cut
