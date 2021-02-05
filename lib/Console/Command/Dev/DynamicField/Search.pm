@@ -18,6 +18,7 @@ use warnings;
 use parent qw(Console::BaseCommand);
 
 our @ObjectDependencies = (
+    'Kernel::Config',
     'Dev::DynamicField',
     'Kernel::System::DynamicField',
 );
@@ -54,6 +55,9 @@ sub Run {
 
     my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
 
+    my $Version = $Kernel::OM->Get('Kernel::Config')->Get('Version');
+    $Version = substr $Version, 0, 1;
+
     if (%SearchOptions) {
 
         %List = $Kernel::OM->Get('Dev::DynamicField')->DynamicFieldSearch(
@@ -61,12 +65,22 @@ sub Run {
         );
     }
     else {
-        %List = %{
-            $DynamicFieldObject->DynamicFieldList(
-                ResultType => 'HASH',
-                UserID     => 1,
-            )
-        };
+        if ( $Version >= 8 ) {
+            %List = %{
+                $DynamicFieldObject->FieldList(
+                    ResultType => 'HASH',
+                    UserID     => 1,
+                )
+            };
+        }
+        else {
+            %List = %{
+                $DynamicFieldObject->DynamicFieldList(
+                    ResultType => 'HASH',
+                    UserID     => 1,
+                )
+            };
+        }
     }
 
     my @ItemIDs = sort { $a <=> $b } keys %List;
@@ -79,11 +93,27 @@ sub Run {
 
         next ITEM if !$ItemID;
 
-        # get item details
-        my $Item = $DynamicFieldObject->DynamicFieldGet(
-            ID     => $ItemID,
-            UserID => 1,
-        );
+        my $Item;
+
+        # Get item details
+        if ( $Version >= 8 ) {
+
+            my $FieldObject = $DynamicFieldObject->FieldGet(
+                ID => $ItemID,
+            );
+            next ITEM if !$FieldObject;
+
+            $Item->{ID}     = $FieldObject->ID();
+            $Item->{Name}   = $FieldObject->Name();
+            $Item->{Label}  = $FieldObject->Label();
+            $Item->{Config} = $FieldObject->Config();
+        }
+        else {
+            $Item = $DynamicFieldObject->DynamicFieldGet(
+                ID     => $ItemID,
+                UserID => 1,
+            );
+        }
         next ITEM if !$Item;
 
         # store item details
