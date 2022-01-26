@@ -111,17 +111,21 @@ sub Run {
 
         next ITEMID if !$ItemID;
 
-        # get item details
-        my %Item = $QueueObject->QueueGet(
-            ID => $ItemID,
+        my $Queue = $QueueObject->QueueLookup(
+            QueueID => $ItemID,
         );
 
         # check if item exists
-        if ( !%Item ) {
+        if ( !$Queue ) {
             $Self->PrintError("The Queue with ID $ItemID does not exist!\n");
             $Failed = 1;
             next ITEMID;
         }
+
+        # get item details
+        my %Item = $QueueObject->QueueGet(
+            ID => $ItemID,
+        );
 
         my @TicketIDs = $TicketObject->TicketSearch(
             Result   => 'ARRAY',
