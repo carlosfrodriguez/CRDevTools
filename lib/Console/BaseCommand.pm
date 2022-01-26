@@ -71,7 +71,7 @@ sub new {
     # Call object specific configure method. We use an eval to trap any exceptions
     #   that might occur here. Only if everything was OK we set the _ConfigureSuccessful
     #   flag.
-    eval {
+    my $Result = eval {
         $Self->Configure();
         $Self->{_ConfigureSuccessful} = 1;
     };
@@ -90,7 +90,7 @@ sub new {
             Description => 'Suppress informative output, only retain error messages.',
         },
         {
-            Name        => 'allow-root',
+            Name => 'allow-root',
             Description =>
                 'Allow root user to execute the command. This might damage your system; use at your own risk.',
             Invisible => 1,    # hide from usage screen
@@ -426,7 +426,7 @@ sub Execute {
         return $Self->ExitCodeError();
     }
 
-    eval { $Self->PreRun(); };
+    my $Result = eval { $Self->PreRun(); };
     if ($@) {
         $Self->PrintError($@);
         return $Self->ExitCodeError();
@@ -434,7 +434,8 @@ sub Execute {
 
     # Make sure we get a proper exit code to return to the shell.
     my $ExitCode;
-    eval {
+    $Result = eval {
+
         # Make sure that PostRun() works even if a user presses ^C.
         local $SIG{INT} = sub {
             $Self->PostRun();
@@ -447,7 +448,7 @@ sub Execute {
         $ExitCode = $Self->ExitCodeError();
     }
 
-    eval { $Self->PostRun(); };
+    $Result = eval { $Self->PostRun(); };
     if ($@) {
         $Self->PrintError($@);
         $ExitCode ||= $Self->ExitCodeError();    # switch from 0 (OK) to error
@@ -521,7 +522,7 @@ sub GetUsageHelp {
         if ( !$Option->{Required} ) {
             $OptionShort = "[$OptionShort]";
         }
-        $UsageText .= " $OptionShort";
+        $UsageText   .= " $OptionShort";
         $OptionsText .= sprintf " <green>%-30s</green> - %s", $OptionShort, $Option->{Description} . "\n";
     }
 
@@ -540,7 +541,7 @@ sub GetUsageHelp {
         if ( !$Argument->{Required} ) {
             $ArgumentShort = "[$ArgumentShort]";
         }
-        $UsageText .= " $ArgumentShort";
+        $UsageText     .= " $ArgumentShort";
         $ArgumentsText .= sprintf " <green>%-30s</green> - %s", $ArgumentShort,
             $Argument->{Description} . "\n";
     }
@@ -1197,7 +1198,7 @@ sub IsArrayRefWithData {    ## no critic
     return 1;
 }
 
-sub IsStringWithData {    ## no critic
+sub IsStringWithData {      ## no critic
     my $TestData = $_[0];
 
     return if !IsString(@_);
