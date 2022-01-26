@@ -74,7 +74,7 @@ Deletes a ticket Group from DB
     );
 
 Returns:
-    $Sucesss = 1;                           # or false if there was any error.
+    $Success = 1;                           # or false if there was any error.
 
 =cut
 
@@ -84,8 +84,8 @@ sub GroupDelete {
     # check needed stuff
     if ( !$Param{Group} && !$Param{GroupID} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Group   => 'error',
-            Message => 'Need User or UserID!'
+            Priority => 'error',
+            Message  => 'Need User or UserID!'
         );
         return;
     }
@@ -96,14 +96,14 @@ sub GroupDelete {
     # set GroupID
     my $GroupID = $Param{GroupID} || '';
     if ( !$GroupID ) {
-        my $GroupID = $GroupObject->GroupLookup(
+        $GroupID = $GroupObject->GroupLookup(
             Group => $Param{Group},
         );
     }
     if ( !$GroupID ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Group   => 'error',
-            Message => 'Group is invalid!'
+            Priority => 'error',
+            Message  => 'Group is invalid!'
         );
         return;
     }
@@ -191,8 +191,8 @@ sub GroupSearch {
     # check needed stuff
     if ( !$Param{Name} ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
-            Group   => 'error',
-            Message => 'Need Name!',
+            Priority => 'error',
+            Message  => 'Need Name!',
         );
         return;
     }
@@ -235,5 +235,3 @@ sub GroupSearch {
 }
 
 1;
-
-=back
