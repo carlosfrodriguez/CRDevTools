@@ -80,7 +80,7 @@ sub ObjectInstanceCreate {
     my ( $Self, $Package, %Param ) = @_;
 
     if ( !$Package ) {
-        die "Could got find Console Command.";
+        die "Could not find Console Command.";
     }
 
     my $FileName = $Package;
