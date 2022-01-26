@@ -78,7 +78,7 @@ sub Run {
         $SearchOptions{UserLogin} = $Login;
     }
     if ( $Email && $Email =~ m{\*} ) {
-        $SearchOptions{Postmaster} = $Email;
+        $SearchOptions{PostMasterSearch} = $Email;
     }
 
     my %List;
