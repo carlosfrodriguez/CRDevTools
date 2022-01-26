@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2020 Carlos Rodriguez, https://github.com/carlosfrodriguez
+# Copyright (C) 2022 Carlos Rodriguez, https://github.com/carlosfrodriguez
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
@@ -30,11 +30,7 @@ All CustomerUser Development functions.
 
 =head1 PUBLIC INTERFACE
 
-=over 4
-
-=cut
-
-=item new()
+=head2 new()
 
 create an object. Do not use it directly, instead use:
 
@@ -63,7 +59,7 @@ sub new {
     return $Self;
 }
 
-=item CustomerUserDelete()
+=head2 CustomerUserDelete()
 
 Deletes a Customeruser from DB, removes any preference group and role relation.
 If Customeruser is used in any other table, Customeruser will not be deleted
@@ -154,5 +150,3 @@ sub CustomerUserDelete {
 }
 
 1;
-
-=back

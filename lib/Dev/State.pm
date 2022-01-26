@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2020 Carlos Rodriguez, https://github.com/carlosfrodriguez
+# Copyright (C) 2022 Carlos Rodriguez, https://github.com/carlosfrodriguez
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
@@ -30,11 +30,7 @@ All Ticket State Development functions.
 
 =head1 PUBLIC INTERFACE
 
-=over 4
-
-=cut
-
-=item new()
+=head2 new()
 
 create an object. Do not use it directly, instead use:
 
@@ -63,7 +59,7 @@ sub new {
     return $Self;
 }
 
-=item StateDelete()
+=head2 StateDelete()
 
 Deletes a ticket State from DB
 
@@ -120,7 +116,7 @@ sub StateDelete {
     return 1;
 }
 
-=item StateSearch()
+=head2 StateSearch()
 
 To search States
 
@@ -184,5 +180,3 @@ sub StateSearch {
 }
 
 1;
-
-=back

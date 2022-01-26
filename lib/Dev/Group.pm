@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2020 Carlos Rodriguez, https://github.com/carlosfrodriguez
+# Copyright (C) 2022 Carlos Rodriguez, https://github.com/carlosfrodriguez
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
@@ -31,11 +31,7 @@ All Ticket Group Development functions.
 
 =head1 PUBLIC INTERFACE
 
-=over 4
-
-=cut
-
-=item new()
+=head2 new()
 
 create an object. Do not use it directly, instead use:
 
@@ -64,7 +60,7 @@ sub new {
     return $Self;
 }
 
-=item GroupDelete()
+=head2 GroupDelete()
 
 Deletes a ticket Group from DB
 
@@ -171,7 +167,7 @@ sub GroupDelete {
     return 1;
 }
 
-=item GroupSearch()
+=head2 GroupSearch()
 
 To search Groups
 

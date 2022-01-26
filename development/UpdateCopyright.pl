@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 # --
-# Copyright (C) 2020 Carlos Rodriguez, https://github.com/carlosfrodriguez
+# Copyright (C) 2022 Carlos Rodriguez, https://github.com/carlosfrodriguez
 # --
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 # --
 # DO NOT USE THIS FILE ON PRODUCTION SYSTEMS!
 #
-# otrs is Copyright (C) 2001-2020 OTRS AG, http://otrs.com/
+# otrs is Copyright (C) 2001-2022 OTRS AG, http://otrs.com/
 
 ## nofilter(TidyAll::Plugin::OTRS::Perl::Time)
 

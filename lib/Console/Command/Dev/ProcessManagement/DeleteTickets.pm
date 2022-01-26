@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2020 Carlos Rodriguez, https://github.com/carlosfrodriguez
+# Copyright (C) 2022 Carlos Rodriguez, https://github.com/carlosfrodriguez
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
@@ -7,7 +7,7 @@
 # --
 # DO NOT USE THIS FILE ON PRODUCTION SYSTEMS!
 #
-# otrs is Copyright (C) 2001-2020 OTRS AG, http://otrs.com/
+# otrs is Copyright (C) 2001-2022 OTRS AG, http://otrs.com/
 # --
 
 package Console::Command::Dev::ProcessManagement::DeleteTickets;
@@ -70,7 +70,7 @@ sub Run {
 
         next TICKETID if !$TicketID;
 
-        next TICKETID if $TicketID eq 1;
+        next TICKETID if $TicketID == 1;
 
         # Get ticket details.
         my %Ticket = $TicketObject->TicketGet(

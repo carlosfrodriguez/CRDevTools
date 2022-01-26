@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2020 Carlos Rodriguez, https://github.com/carlosfrodriguez
+# Copyright (C) 2022 Carlos Rodriguez, https://github.com/carlosfrodriguez
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
@@ -31,11 +31,7 @@ All User Development functions.
 
 =head1 PUBLIC INTERFACE
 
-=over 4
-
-=cut
-
-=item new()
+=head2 new()
 
 create an object. Do not use it directly, instead use:
 
@@ -64,7 +60,7 @@ sub new {
     return $Self;
 }
 
-=item UserDelete()
+=head2 UserDelete()
 
 Deletes a user from DB, removes any preference group and role relation.
 If user is used in any other table, user will not be deleted
@@ -280,5 +276,3 @@ sub RelatedTicketsGet {
 }
 
 1;
-
-=back
