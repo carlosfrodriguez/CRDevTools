@@ -90,7 +90,7 @@ sub new {
             Description => 'Suppress informative output, only retain error messages.',
         },
         {
-            Name => 'allow-root',
+            Name        => 'allow-root',
             Description =>
                 'Allow root user to execute the command. This might damage your system; use at your own risk.',
             Invisible => 1,    # hide from usage screen
@@ -521,7 +521,7 @@ sub GetUsageHelp {
         if ( !$Option->{Required} ) {
             $OptionShort = "[$OptionShort]";
         }
-        $UsageText   .= " $OptionShort";
+        $UsageText .= " $OptionShort";
         $OptionsText .= sprintf " <green>%-30s</green> - %s", $OptionShort, $Option->{Description} . "\n";
     }
 
@@ -540,7 +540,7 @@ sub GetUsageHelp {
         if ( !$Argument->{Required} ) {
             $ArgumentShort = "[$ArgumentShort]";
         }
-        $UsageText     .= " $ArgumentShort";
+        $UsageText .= " $ArgumentShort";
         $ArgumentsText .= sprintf " <green>%-30s</green> - %s", $ArgumentShort,
             $Argument->{Description} . "\n";
     }
@@ -610,6 +610,233 @@ sub Print {
         print $Self->_ReplaceColorTags($Text);
     }
     return;
+}
+
+=head2 TableOutput()
+
+this method generates an ascii table of headers and column content
+
+    my $FormattedOutput = $Command->TableOutput(
+        TableData => {
+            Header => [
+                'First Header',
+                'Second Header',
+                'Third Header'
+            ],
+            Body => [
+                [ 'FirstItem 1', 'SecondItem 1', 'ThirdItem 1' ],
+                [ 'FirstItem 2', 'SecondItem 2', 'ThirdItem 2' ],
+                [ 'FirstItem 3', 'SecondItem 3', 'ThirdItem 3' ],
+                [ 'FirstItem 4', 'SecondItem 4', 'ThirdItem 4' ],
+            ],
+        },
+        Indention => 2, # Spaces to indent (ltr), default 0;
+        EvenOdd   => 'yellow', # add even and odd line coloring (green|yellow|red)
+                               # (overwrites existing coloring), # default 0
+    );
+
+    Returns:
+
+    +--------------+---------------+--------------+
+    | First Header | Second Header | Third Header |
+    +--------------+---------------+--------------+
+    | FirstItem 1  | SecondItem 1  | ThirdItem 1  |
+    | FirstItem 2  | SecondItem 2  | ThirdItem 1  |
+    | FirstItem 3  | SecondItem 3  | ThirdItem 1  |
+    | FirstItem 4  | SecondItem 4  | ThirdItem 1  |
+    +--------------+---------------+--------------+
+
+=cut
+
+sub TableOutput {
+    my ( $Self, %Param ) = @_;
+
+    return if $Param{TableData}->{Header} && !IsArrayRefWithData( $Param{TableData}->{Header} );
+    return if $Param{TableData}->{Body}   && !IsArrayRefWithData( $Param{TableData}->{Body} );
+
+    my @MaxColumnLength;
+
+    # check for available header row and determine lengths
+    my $ShowHeader = IsArrayRefWithData( $Param{TableData}->{Header} ) ? 1 : 0;
+
+    if ($ShowHeader) {
+
+        my $HeaderCount = 0;
+
+        for my $Header ( @{ $Param{TableData}->{Header} } ) {
+
+            # detect coloring
+            my $PreparedHeader = $Header;
+
+            if ( $PreparedHeader =~ m/<.+?>.+?<\/.+?>/smx ) {
+                $PreparedHeader =~ s{ (<.+?>)(.+?)(<\/.+?>) }{$2}xmsg;
+            }
+
+            # detect header value length
+            if ( !$MaxColumnLength[$HeaderCount] || $MaxColumnLength[$HeaderCount] < length $PreparedHeader ) {
+                $MaxColumnLength[$HeaderCount] = length $PreparedHeader;
+            }
+            $HeaderCount++;
+        }
+    }
+
+    ROW:
+    for my $Row ( @{ $Param{TableData}->{Body} } ) {
+
+        next ROW if !$Row;
+        next ROW if !IsArrayRefWithData($Row);
+
+        # determine maximum length of every column
+        my $ColumnCount = 0;
+
+        for my $Column ( @{$Row} ) {
+
+            # detect coloring
+            my $PreparedColumn = $Column || ' ';
+
+            if ( $PreparedColumn =~ m/<.+?>.+?<\/.+?>/smx ) {
+                $PreparedColumn =~ s{ (<.+?>)(.+?)(<\/.+?>) }{$2}xmsg;
+            }
+
+            # detect column value length
+            if ( !$MaxColumnLength[$ColumnCount] || $MaxColumnLength[$ColumnCount] < length $PreparedColumn ) {
+                $MaxColumnLength[$ColumnCount] = length $PreparedColumn;
+            }
+            $ColumnCount++;
+        }
+    }
+
+    # generate horizontal border
+    my $HorizontalBorder = '';
+
+    my $ColumnCount = 0;
+
+    for my $ColumnLength (@MaxColumnLength) {
+
+        # add space character before and after column content
+        $ColumnLength += 2;
+
+        # save new column length in maximum column length array
+        $MaxColumnLength[$ColumnCount] = $ColumnLength;
+
+        # save border part
+        $HorizontalBorder .= '+' . ( '-' x $ColumnLength );
+
+        $ColumnCount++;
+    }
+
+    $HorizontalBorder .= '+';
+
+    if ( $Param{Indention} ) {
+        my $Indention = ' ' x $Param{Indention};
+        $HorizontalBorder = $Indention . $HorizontalBorder;
+    }
+
+    # add first border to output
+    my $Output = $HorizontalBorder . "\n";
+
+    # add header row if available
+    if ($ShowHeader) {
+
+        my $HeaderContent = '';
+        my $HeaderCount   = 0;
+
+        if ( $Param{Indention} ) {
+            my $Indention = ' ' x $Param{Indention};
+            $HeaderContent = $Indention . $HeaderContent;
+        }
+
+        for my $Header ( @{ $Param{TableData}->{Header} } ) {
+
+            # prepare header content
+            $HeaderContent .= '| ' . $Header;
+
+            # detect coloring
+            if ( $Header =~ m/<.+?>.+?<\/.+?>/smx ) {
+                $Header =~ s{ (<.+?>)(.+?)(<\/.+?>) }{$2}xmsg;
+            }
+
+            # determine difference between current header content and maximum content length
+            my $HeaderContentDiff = ( $MaxColumnLength[$HeaderCount] ) - ( length $Header );
+
+            # fill up with spaces
+            if ($HeaderContentDiff) {
+                $HeaderContent .= ' ' x ( $HeaderContentDiff - 1 );
+            }
+
+            $HeaderCount++;
+        }
+
+        # save the result as output
+        $Output .= $HeaderContent . "|\n";
+
+        # add horizontal border
+        $Output .= $HorizontalBorder . "\n";
+    }
+
+    my $EvenOddIndicator = 0;
+
+    # add body rows
+    Row:
+    for my $Row ( @{ $Param{TableData}->{Body} } ) {
+
+        next ROW if !$Row;
+        next ROW if !IsArrayRefWithData($Row);
+
+        my $RowContent  = '';
+        my $ColumnCount = 0;
+
+        if ( $Param{Indention} ) {
+            my $Indention = ' ' x $Param{Indention};
+            $RowContent = $Indention . $RowContent;
+        }
+
+        for my $Column ( @{$Row} ) {
+
+            $Column = IsStringWithData($Column) ? $Column : ' ';
+
+            # even and odd coloring
+            if ( $Param{EvenOdd} ) {
+
+                if ( $Column =~ m/<.+?>.+?<\/.+?>/smx ) {
+                    $Column =~ s{ (<.+?>)(.+?)(<\/.+?>) }{$2}xmsg;
+                }
+
+                if ($EvenOddIndicator) {
+                    $Column = "<$Param{EvenOdd}>" . $Column . "</$Param{EvenOdd}>";
+                }
+            }
+
+            # prepare header content
+            $RowContent .= '| ' . $Column;
+
+            # detect coloring
+            if ( $Column =~ m/<.+?>.+?<\/.+?>/smx ) {
+                $Column =~ s{ (<.+?>)(.+?)(<\/.+?>) }{$2}xmsg;
+            }
+
+            # determine difference between current column content and maximum content length
+            my $RowContentDiff = ( $MaxColumnLength[$ColumnCount] ) - ( length $Column );
+
+            # fill up with spaces
+            if ($RowContentDiff) {
+                $RowContent .= ' ' x ( $RowContentDiff - 1 );
+            }
+
+            $ColumnCount++;
+        }
+
+        # toggle even odd indicator
+        $EvenOddIndicator = $EvenOddIndicator ? 0 : 1;
+
+        # save the result as output
+        $Output .= $RowContent . "|\n";
+    }
+
+    # add trailing horizontal border
+    $Output .= $HorizontalBorder . "\n";
+
+    return $Output // '';
 }
 
 =head2 DirectoryRead()
@@ -683,6 +910,9 @@ sub DirectoryRead {
 
 =head2 OutputTable()
 
+
+Deprecated!
+
 Outputs the item details in a tabular format.
 
     my $Success = $CommandObject->OutputTable(
@@ -709,6 +939,8 @@ Outputs the item details in a tabular format.
 
 sub OutputTable {
     my ( $Self, %Param ) = @_;
+
+    $Self->Print("OutputTable() is deprecated update to TableOutput()\n");
 
     # print header
     my $Header = "\n";
@@ -943,7 +1175,35 @@ sub _GetConfig {
     $Config{ModuleToolsDirectory} = $ModuleToolsDirectory;
 
     return \%Config;
+}
 
+sub IsString {    ## no critic
+    my $TestData = $_[0];
+
+    return if scalar @_ != 1;
+    return if ref $TestData;
+    return if !defined $TestData;
+
+    return 1;
+}
+
+sub IsArrayRefWithData {    ## no critic
+    my $TestData = $_[0];
+
+    return if scalar @_ != 1;
+    return if ref $TestData ne 'ARRAY';
+    return if !@{$TestData};
+
+    return 1;
+}
+
+sub IsStringWithData {    ## no critic
+    my $TestData = $_[0];
+
+    return if !IsString(@_);
+    return if $TestData eq '';
+
+    return 1;
 }
 
 1;
