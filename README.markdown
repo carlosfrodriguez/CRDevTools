@@ -16,7 +16,7 @@ e.g.
 
 or with a git alias like:
 
-```apacheconf
+```conf
 devtools = !/opt/CRDevTools/bin/cr.DevTools.pl
 ```
 
@@ -32,183 +32,157 @@ Use parameter --help to get more information on the options and general usage of
 
 ### Delete Tools
 
-* Dev::ACL::Delete:
+#### Dev::ACL::Delete
 
-  Delete ACLs from DB, also generates an ACL deployment to sync ZZZACL.pm file.
-  &nbsp;
+* Delete ACLs from DB, also generates an ACL deployment to sync ZZZACL.pm file.
 
-* Dev::ChatChannel::Delete:
+#### Dev::ChatChannel::Delete
 
-  Delete chat channels from the DB
-  Can delete associated chat messages
-  &nbsp;
+* Delete chat channels from the DB
+* Can delete associated chat messages
 
-* Dev::CustomerCompany::Delete
+#### Dev::CustomerCompany::Delete
 
-  Delete customer companies from the DB
-  &nbsp;
+* Delete customer companies from the DB
 
-* Dev::CustomerUser::Delete:
+#### Dev::CustomerUser::Delete
 
-  Delete customer users from DB, also removes relations from **_&lt;CustomerUser Preferences Table&gt;_**
+* Delete customer users from DB, also removes relations from **_&lt;CustomerUser Preferences Table&gt;_**
+* **TODO: Delete group relations**
 
-  **TODO: Delete group relations**
-  &nbsp;
+#### Dev::DynamicField::Delete
 
-* Dev::DynamicField::Delete:
+* Delete dynamic fields from DB, also removes field values.
 
-  Delete dynamic fields from DB, also removes field values.
-  &nbsp;
+#### Dev::FAQ::Delete
 
-* Dev::FAQ::Delete:
+* Delete knowledge base articles from the DB
 
-  Delete knowledge base articles from the DB
-  &nbsp;
+#### Dev::Group::Delete
 
-* Dev::Group::Delete:
+* Delete groups from DB, also removes relations from *group_user* and *group_role*.
+* **TODO: Delete CustomerUser relations**
 
-  Delete groups from DB, also removes relations from *group_user* and *group_role*.
+#### Dev::Priority::Delete
 
-  **TODO: Delete CustomerUser relations**
-  &nbsp;
+* Delete ticket priorities from DB.
+* Can delete associated tickets.
 
-* Dev::Priority::Delete:
+#### Dev::Process::Delete
 
-  Delete ticket priorities from DB.
-  Can delete associated tickets.
-  &nbsp;
+* Delete processes from DB, also generates an process deployment to sync ZZZProcessManagement.pm file.
 
-* Dev::Process
+#### Dev::Process::DeleteTickets
 
-  * Dev::Process::Delete:
+* Delete process tickets from DB.
 
-    Delete processes from DB, also generates an process deployment to sync ZZZProcessManagement.pm file.
-    &nbsp;
+#### Dev::Process::Activity::Delete
 
-  * Dev::Process::DeleteTickets:
+* Delete process activities from the DB.
 
-    Delete process tickets from DB.
-    &nbsp;
+#### Dev::Process::ActivityDialog::Delete
 
-  * Dev::Process::Activity::Delete:
+* Delete process activity dialogs from the DB.
 
-    Delete process activities from the DB.
-    &nbsp;
+#### Dev::Process::SequenceFlow::Delete
 
-  * Dev::Process::ActivityDialog::Delete:
+* Delete process sequence flows from the DB.
 
-    Delete process activity dialogs from the DB.
-    &nbsp;
+#### Dev::Process::SequenceFlowAction::Delete
 
-  * Dev::Process::SequenceFlow::Delete:
+* Delete process sequence flow actions from the DB.
 
-    Delete process sequence flows from the DB.
-    &nbsp;
+#### Dev::Queue::Delete
 
-  * Dev::Process::SequenceFlowAction::Delete:
+* Delete queues from DB, also removes relations from *personal_queues*, *queue_auto_response*, *queue_preferences* and *queue_standard_template*.
+* Can delete associated tickets.
 
-    Delete process sequence flow actions from the DB.
-    &nbsp;
+#### Dev::Service::Delete
 
-* Dev::Queue::Delete:
+* Delete services from DB, also removes relations from *service_customer_user*, *service_preferences*, *service_sla* and *personal_services*.
+* Can delete associated tickets.
 
-  Delete queues from DB, also removes relations from *personal_queues*, *queue_auto_response*, *queue_preferences* and *queue_standard_template*.
+#### Dev::State::Delete
 
-  Can delete associated tickets.
-  &nbsp;
-]
-* Dev::Service::Delete:
+* Delete ticket states from DB.
+* Can delete associated tickets.
 
-  Delete services from DB, also removes relations from *service_customer_user*, *service_preferences*, *service_sla* and *personal_services*.
-  Can delete associated tickets.
-  &nbsp;
+#### Dev::Ticket::Delete
 
-* Dev::State::Delete:
+* Delete tickets from DB, including Articles and History (using OTRS API).
+* Can delete all tickets at once (leaving initial ticket).
 
-  Delete ticket states from DB.
-  Can delete associated tickets.
-  &nbsp;
+#### Dev::Type::Delete
 
-* Dev::Ticket::Delete:
+* Delete ticket types from the DB.
+* Can delete associated tickets.
 
-  Delete tickets from DB, including Articles and History (using OTRS API).
-  Can delete all tickets at once (leaving initial ticket).
-  &nbsp;
+#### Dev::User::Delete
 
-* Dev::Type::Delete:
-
-   Delete ticket types from the DB.
-   Can delete associated tickets.
-  &nbsp;
-
-* Dev::User::Delete:
-
-  Delete users from DB, also removes relations from
-  *group_user*, *role_user*, *article_fag*, *ticket_history* and **_&lt;User Preferences Table&gt;_**
-  **Warning:** As many tables are related to **_&lt;User Table&gt;_** before try to delete any user it is necessary to check if is not referenced by any other table.
-  &nbsp;
+* Delete users from DB, also removes relations from
+*group_user*, *role_user*, *article_fag*, *ticket_history* and **_&lt;User Preferences Table&gt;_**
+* **Warning:** As many tables are related to **_&lt;User Table&gt;_** before try to delete any user it is necessary to check if is not referenced by any other table.
 
 ### Search Tools
 
-* Dev::ACL::Search
+#### Dev::ACL::Search
 
-  Search ACLs by name.
+* Search ACLs by name.
 
-* Dev::CustomerUser::Search
+#### Dev::CustomerUser::Search
 
-  Search customer users by login email or full-text (login first_name last_name).
+* Search customer users by login email or full-text (login first_name last_name).
 
-* Dev::DynamicField::Search
+#### Dev::DynamicField::Search
 
-  Search dynamic fields by name.
+* Search dynamic fields by name.
 
-* Dev::Group::Search
+#### Dev::Group::Search
 
-  Search groups by name.
+* Search groups by name.
 
-* Dev::Priority::Search
+#### Dev::Priority::Search
 
-  Search priorities by name.
+* Search priorities by name.
 
-* Dev::Process::Search
+#### Dev::Process::Search
 
-  Search processes by name.
+* Search processes by name.
 
-* Dev::Queue::Search
+#### Dev::Queue::Search
 
-  Search queues by name.
+* Search queues by name.
 
-* Dev::Service::Search
+#### Dev::Service::Search
 
-  Search services by name.
+* Search services by name.
 
-* Dev::State::Search
+#### Dev::State::Search
 
-  Search states by name.
+* Search states by name.
 
-* Dev::Ticket::Search
+#### Dev::Ticket::Search
 
-  Search tickets by number, title customer owner or full-text (from to cc subject body).
+* Search tickets by number, title customer owner or full-text (from to cc subject body).
 
-* Dev::Type::Search
+#### Dev::Type::Search
 
-  Search ticket types by name.
+* Search ticket types by name.
 
-* Dev::User::Search
+#### Dev::User::Search
 
-  Search users by login email or full-text (login first_name last_name).
+* Search users by login email or full-text (login first_name last_name).
 
 ### General Tools
 
-* Dev::Process::Deploy
+#### Dev::Process::Deploy
 
-  Deploy all processes into Kernel/Config/Files/ZZZProcessManagement.pm
+* Deploy all processes into Kernel/Config/Files/ZZZProcessManagement.pm
 
-* cr.DevProcessManagement: (deprecated)
+#### cr.DevProcessManagement: (deprecated)
 
-   Import processes without changing the entity ID (raw import).
-
-   Generate tickets for available processes using a random process and a random activity.
+* Import processes without changing the entity ID (raw import).
+* Generate tickets for available processes using a random process and a random activity.
 
 #### Note
 
