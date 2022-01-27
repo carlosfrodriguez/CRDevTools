@@ -113,7 +113,6 @@ sub Run {
             Body   => [ map { [ $_->{ID}, $_->{Email}, $_->{Name} ] } @Items ],
         },
         Indention => 2,
-        EvenOdd   => 'yellow',
     );
 
     $Self->Print("$FormattedOutput");

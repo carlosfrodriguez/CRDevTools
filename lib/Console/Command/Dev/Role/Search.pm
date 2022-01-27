@@ -91,15 +91,12 @@ sub Run {
         return $Self->ExitCodeOk();
     }
 
-    my @Body = map { [ $_->{ID}, $_->{Name} ] } @Items;
-
     my $FormattedOutput = $Self->TableOutput(
         TableData => {
             Header => [ 'ID', 'Name', ],
-            Body   => \@Body,
+            Body   => [ map { [ $_->{ID}, $_->{Name} ] } @Items ],
         },
         Indention => 2,
-        EvenOdd   => 'yellow',
     );
 
     $Self->Print("$FormattedOutput");
