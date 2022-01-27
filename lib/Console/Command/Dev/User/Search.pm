@@ -120,15 +120,15 @@ sub Run {
         return $Self->ExitCodeOk();
     }
 
-    $Self->OutputTable(
-        Items        => \@Items,
-        Columns      => [ 'ID', 'Login', 'Email', ],
-        ColumnLength => {
-            ID    => 7,
-            Login => 50,
-            Email => 50,
+    my $FormattedOutput = $Self->TableOutput(
+        TableData => {
+            Header => [ 'ID', 'Login', 'Email' ],
+            Body   => [ map { [ $_->{ID}, $_->{Login}, $_->{Email} ] } @Items ],
         },
+        Indention => 2,
     );
+
+    $Self->Print("$FormattedOutput");
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();
