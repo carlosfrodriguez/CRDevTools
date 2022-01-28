@@ -87,25 +87,20 @@ sub Run {
 
         next ITEMID if !$ItemID;
 
-        # get item details
         my $Item = $ACLObject->ACLGet(
             ID     => $ItemID,
             UserID => 1,
         );
-
-        # check if item exists
         if ( !$Item ) {
             $Self->PrintError("The ACL with ID $ItemID does not exist!\n");
             $Failed = 1;
             next ITEMID;
         }
 
-        # delete Type
         my $Success = $ACLObject->ACLDelete(
             ID     => $ItemID,
             UserID => 1,
         );
-
         if ( !$Success ) {
             $Self->PrintError("Can't delete ACL $ItemID!\n");
             $Failed = 1;
@@ -140,7 +135,6 @@ sub Run {
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();
-
 }
 
 1;

@@ -45,17 +45,14 @@ sub Run {
 
     my %SearchOptions;
 
-    my %List;
-
-    # ACL name search
     if ( $Self->GetOption('name') ) {
         $SearchOptions{Name} = $Self->GetOption('name');
     }
 
     my $ACLObject = $Kernel::OM->Get('Kernel::System::ACL::DB::ACL');
 
+    my %List;
     if (%SearchOptions) {
-
         %List = $Kernel::OM->Get('Dev::ACL')->ACLSearch(
             %SearchOptions,
         );
@@ -66,7 +63,6 @@ sub Run {
 
     my @ItemIDs = sort { $a cmp $b } keys %List;
 
-    # to store all item details
     my @Items;
 
     ITEM:
@@ -74,14 +70,12 @@ sub Run {
 
         next ITEM if !$ItemID;
 
-        # get item details
         my $Item = $ACLObject->ACLGet(
             ID     => $ItemID,
             UserID => 1,
         );
         next ITEM if !$Item;
 
-        # store item details
         push @Items, $Item,;
     }
 
@@ -92,14 +86,15 @@ sub Run {
         return $Self->ExitCodeOk();
     }
 
-    $Self->OutputTable(
-        Items        => \@Items,
-        Columns      => [ 'ID', 'Name', ],
-        ColumnLength => {
-            ID   => 50,
-            Name => 50,
+    my $FormattedOutput = $Self->TableOutput(
+        TableData => {
+            Header => [ 'ID', 'Name', ],
+            Body   => [ map { [ $_->{ID}, $_->{Name}, ] } @Items ],
         },
+        Indention => 2,
     );
+
+    $Self->Print("$FormattedOutput");
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();
