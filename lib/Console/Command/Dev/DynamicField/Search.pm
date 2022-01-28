@@ -26,11 +26,11 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Search DynamicFields in the system.');
+    $Self->Description('Search Dynamic Fields in the system.');
 
     $Self->AddOption(
         Name        => 'name',
-        Description => "Search DynamicFields with specified DynamicField name e.g. *MyDynamicField*.",
+        Description => "Search dynamic fields with specified dynamic field name e.g. *MyDynamicField*.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -42,7 +42,7 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Listing DynamicFields...</yellow>\n");
+    $Self->Print("<yellow>Listing Dynamic Fields...</yellow>\n");
 
     my %SearchOptions;
 
@@ -59,7 +59,6 @@ sub Run {
     $Version = substr $Version, 0, 1;
 
     if (%SearchOptions) {
-
         %List = $Kernel::OM->Get('Dev::DynamicField')->DynamicFieldSearch(
             %SearchOptions,
         );
@@ -95,7 +94,6 @@ sub Run {
 
         my $Item;
 
-        # Get item details
         if ( $Version >= 8 ) {
 
             my $FieldObject = $DynamicFieldObject->FieldGet(
@@ -116,25 +114,25 @@ sub Run {
         }
         next ITEM if !$Item;
 
-        # store item details
         push @Items, $Item,;
     }
 
     if ( !@Items ) {
-        $Self->Print("No DynamicFieldS found\n");
+        $Self->Print("No dynamic fields found.\n");
 
         $Self->Print("<green>Done.</green>\n");
         return $Self->ExitCodeOk();
     }
 
-    $Self->OutputTable(
-        Items        => \@Items,
-        Columns      => [ 'ID', 'Name', ],
-        ColumnLength => {
-            ID   => 50,
-            Name => 50,
+    my $FormattedOutput = $Self->TableOutput(
+        TableData => {
+            Header => [ 'ID', 'Name', ],
+            Body   => [ map { [ $_->{ID}, $_->{Name}, ] } @Items ],
         },
+        Indention => 2,
     );
+
+    $Self->Print("$FormattedOutput");
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();

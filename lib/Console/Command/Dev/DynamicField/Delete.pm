@@ -26,10 +26,10 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Delete one or more DynamicFields.');
+    $Self->Description('Delete one or more Dynamic Fields.');
     $Self->AddOption(
         Name        => 'id',
-        Description => "Specify one or more DynamicField ids of DynamicFields to be deleted.",
+        Description => "Specify one or more dynamic field ids of dynamic fields to be deleted.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/\d+/smx,
@@ -37,7 +37,7 @@ sub Configure {
     );
     $Self->AddOption(
         Name        => 'id-range',
-        Description => "Specify a range of DynamicField ids to be deleted. (e.g. 1..10)",
+        Description => "Specify a range of dynamic field ids to be deleted. (e.g. 1..10)",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/\d+\.\.\d+/smx,
@@ -67,7 +67,7 @@ sub PreRun {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Deleting DynamicFields...</yellow>\n");
+    $Self->Print("<yellow>Deleting Dynamic Fields...</yellow>\n");
 
     my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
 
@@ -93,13 +93,10 @@ sub Run {
 
         my $Success;
 
-        # Get item details.
         if ( $Version >= 8 ) {
             my $FieldObject = $DynamicFieldObject->FieldGet(
                 ID => $ItemID,
             );
-
-            # Check if item exists.
             if ( !$FieldObject ) {
                 $Self->PrintError("The DynamicField with ID $ItemID does not exist!\n");
                 $Failed = 1;
@@ -109,7 +106,6 @@ sub Run {
             my $ValuesDeleteSuccess = $FieldObject->ValueDelete(
                 UserID => 1,
             );
-
             if ( !$ValuesDeleteSuccess ) {
                 $Self->PrintError("Can't delete all DynamicField $ItemID values!\n");
                 $Failed = 1;
@@ -129,8 +125,6 @@ sub Run {
                 ID     => $ItemID,
                 UserID => 1,
             );
-
-            # Check if item exists.
             if ( !$Item || !%{$Item} ) {
                 $Self->PrintError("The DynamicField with ID $ItemID does not exist!\n");
                 $Failed = 1;
@@ -147,7 +141,6 @@ sub Run {
                 next ITEMID;
             }
 
-            # Delete dynamic field.
             $Success = $DynamicFieldObject->DynamicFieldDelete(
                 ID     => $ItemID,
                 UserID => 1,
@@ -155,16 +148,16 @@ sub Run {
         }
 
         if ( !$Success ) {
-            $Self->PrintError("Can't delete DynamicField $ItemID!\n");
+            $Self->PrintError("Can't delete dynamic field $ItemID!\n");
             $Failed = 1;
             next ITEMID;
         }
 
-        $Self->Print("  Deleted DynamicField <yellow>$ItemID</yellow>\n");
+        $Self->Print("  Deleted dynamic field <yellow>$ItemID</yellow>\n");
     }
 
     if ($Failed) {
-        $Self->PrintError("Not all DynamicFields where deleted\n");
+        $Self->PrintError("Not all dynamic fields where deleted\n");
         return $Self->ExitCodeError();
     }
 

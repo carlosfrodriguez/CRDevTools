@@ -25,7 +25,7 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Delete one or more customer users.');
+    $Self->Description('Delete one or more Customer Users.');
     $Self->AddOption(
         Name        => 'login',
         Description => "Specify the login of customer users to be deleted e.g. *MyCustomerUser*..",
@@ -83,11 +83,9 @@ sub Run {
 
     my %List;
 
-    # get CustomerUser object
     my $CustomerUserObject = $Kernel::OM->Get('Kernel::System::CustomerUser');
 
     if (%SearchOptions) {
-
         %List = $CustomerUserObject->CustomerSearch(
             %SearchOptions,
             Valid => 0,
@@ -118,34 +116,29 @@ sub Run {
 
         next ITEMID if !$ItemID;
 
-        # get item details
         my %Item = $CustomerUserObject->CustomerUserDataGet(
             User => $ItemID,
         );
-
-        # check if item exists
         if ( !%Item ) {
-            $Self->PrintError("The CustomerUser with Login $ItemID does not exist!\n");
+            $Self->PrintError("The customer user with Login $ItemID does not exist!\n");
             $Failed = 1;
             next ITEMID;
         }
 
-        # delete customer user
         my $Success = $DevCustomerUserObject->CustomerUserDelete(
             CustomerUser => $ItemID,
         );
-
         if ( !$Success ) {
-            $Self->PrintError("Can't delete CustomerUser $ItemID!\n");
+            $Self->PrintError("Can't delete customer user $ItemID!\n");
             $Failed = 1;
             next ITEMID;
         }
 
-        $Self->Print("  Deleted CustomerUser <yellow>$ItemID</yellow>\n");
+        $Self->Print("  Deleted customer user <yellow>$ItemID</yellow>\n");
     }
 
     if ($Failed) {
-        $Self->PrintError("Not all CustomerUsers where deleted\n");
+        $Self->PrintError("Not all customer users where deleted.\n");
         return $Self->ExitCodeError();
     }
 

@@ -25,18 +25,18 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Search CustomerUsers in the system.');
+    $Self->Description('Search Customer Users in the system.');
 
     $Self->AddOption(
         Name        => 'login',
-        Description => "Search CustomerUsers with specified CustomerUser login name e.g. *MyCustomerUser*.",
+        Description => "Search customer users with specified customer user login name e.g. *MyCustomerUser*.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
         Name        => 'email',
-        Description => 'Search CustomerUsers with specified CustomerUser email address e.g. *some@example.com*.',
+        Description => 'Search CustomerUsers with specified customer user email address e.g. *some@example.com*.',
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -55,7 +55,7 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Listing CustomerUsers...</yellow>\n");
+    $Self->Print("<yellow>Listing Customer Users...</yellow>\n");
 
     my %SearchOptions;
 
@@ -93,7 +93,6 @@ sub Run {
 
     my @ItemIDs = sort { $a cmp $b } keys %List;
 
-    # to store all item details
     my @Items;
 
     ITEM:
@@ -122,14 +121,15 @@ sub Run {
         return $Self->ExitCodeOk();
     }
 
-    $Self->OutputTable(
-        Items        => \@Items,
-        Columns      => [ 'Login', 'Email', ],
-        ColumnLength => {
-            Login => 50,
-            Email => 50,
+    my $FormattedOutput = $Self->TableOutput(
+        TableData => {
+            Header => [ 'Login', 'Email', ],
+            Body   => [ map { [ $_->{Login}, $_->{Email}, ] } @Items ],
         },
+        Indention => 2,
     );
+
+    $Self->Print("$FormattedOutput");
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();

@@ -61,7 +61,7 @@ sub Run {
         %List = %{ $ACLObject->ACLList( UserID => 1 ) };
     }
 
-    my @ItemIDs = sort { $a cmp $b } keys %List;
+    my @ItemIDs = sort { $a <=> $b } keys %List;
 
     my @Items;
 

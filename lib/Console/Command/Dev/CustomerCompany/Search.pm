@@ -25,30 +25,22 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Search CustomerCompaies in the system.');
+    $Self->Description('Search Customer Companies in the system.');
 
     $Self->AddOption(
         Name        => 'name',
-        Description => "Search CustomerCompanies with specified CustomerCompany name e.g. *MyCustomerName*.",
+        Description => "Search customer companies with specified customer company name e.g. *MyCustomerName*.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
         Name        => 'id',
-        Description => 'Search CustomerCompanies with specified CustomerCompany id e.g. *Customer*.',
+        Description => 'Search customer companies with specified customer company id e.g. *Customer*.',
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
     );
-
-    # $Self->AddOption(
-    #     Name        => 'full-text',
-    #     Description => "Full text search on fields login, first_name last_name e.g. *text*.",
-    #     Required    => 0,
-    #     HasValue    => 1,
-    #     ValueRegex  => qr/.*/smx,
-    # );
 
     return;
 }
@@ -56,11 +48,10 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Listing CustomerCompanies...</yellow>\n");
+    $Self->Print("<yellow>Listing Customer Companies...</yellow>\n");
 
     my %SearchOptions;
 
-    # CustomerUser name search
     if ( $Self->GetOption('name') ) {
         $SearchOptions{CustomerCompanyName} = $Self->GetOption('name');
     }
@@ -74,7 +65,6 @@ sub Run {
     my $ItemIDs;
 
     if (%SearchOptions) {
-
         $ItemIDs = $CustomerCompanyObject->CustomerCompanySearchDetail(
             %SearchOptions,
             Valid => 0,
@@ -89,25 +79,22 @@ sub Run {
         );
     }
 
-    # to store all item details
     my @Items;
 
     ITEM:
-    for my $ItemID ( @{ $ItemIDs || [] } ) {
+    for my $ItemID ( sort { $a cmp $b } @{ $ItemIDs || [] } ) {
 
         next ITEM if !$ItemID;
 
-        # get item details
         my %Item = $CustomerCompanyObject->CustomerCompanyGet(
             CustomerID => $ItemID,
         );
         next ITEM if !%Item;
 
-        # prepare CustomerCompany information
+        # Prepare CustomerCompany information.
         $Item{Name} = $Item{CustomerCompanyName} || '';
         $Item{ID}   = $Item{CustomerID}          || '';
 
-        # store item details
         push @Items, \%Item,;
     }
 
@@ -118,14 +105,15 @@ sub Run {
         return $Self->ExitCodeOk();
     }
 
-    $Self->OutputTable(
-        Items        => \@Items,
-        Columns      => [ 'ID', 'Name', ],
-        ColumnLength => {
-            ID   => 50,
-            Name => 50,
+    my $FormattedOutput = $Self->TableOutput(
+        TableData => {
+            Header => [ 'CustomerID', 'Name', ],
+            Body   => [ map { [ $_->{ID}, $_->{Name}, ] } @Items ],
         },
+        Indention => 2,
     );
+
+    $Self->Print("$FormattedOutput");
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();
