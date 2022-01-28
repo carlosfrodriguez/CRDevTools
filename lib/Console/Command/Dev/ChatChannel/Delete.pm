@@ -98,13 +98,10 @@ sub Run {
 
         next ITEMID if !$ItemID;
 
-        # get item details
         my %Item = $ChatChannelObject->ChatChannelGet(
             ChatChannelID => $ItemID,
             UserID        => 1,
         );
-
-        # Check if item exists.
         if ( !%Item ) {
             $Self->PrintError("The $Self->{ItemName} with ID $ItemID does not exist!\n");
             $Failed = 1;

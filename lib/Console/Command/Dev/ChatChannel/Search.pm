@@ -48,15 +48,13 @@ sub Run {
 
     my %SearchOptions;
 
-    my %List;
-
-    # Item name search.
     if ( $Self->GetOption('name') ) {
         $SearchOptions{Name} = $Self->GetOption('name');
     }
 
     my $ChatChannelObject = $Kernel::OM->Get('Kernel::System::ChatChannel');
 
+    my %List;
     if (%SearchOptions) {
 
         %List = $Kernel::OM->Get('Dev::ChatChannel')->ChatChannelSearch(
@@ -75,7 +73,6 @@ sub Run {
 
     my @ItemIDs = sort { $a <=> $b } keys %List;
 
-    # To store all item details.
     my @Items;
 
     ITEM:
@@ -83,14 +80,12 @@ sub Run {
 
         next ITEM if !$ItemID;
 
-        # Get item details.
         my %Item = $ChatChannelObject->ChatChannelGet(
             ChatChannelID => $ItemID,
             UserID        => 1,
         );
         next ITEM if !%Item;
 
-        # Store item details.
         push @Items, \%Item,;
     }
 
@@ -101,14 +96,15 @@ sub Run {
         return $Self->ExitCodeOk();
     }
 
-    $Self->OutputTable(
-        Items        => \@Items,
-        Columns      => [ 'ChatChannelID', 'Name', ],
-        ColumnLength => {
-            ChatChannelID => 50,
-            Name          => 50,
+    my $FormattedOutput = $Self->TableOutput(
+        TableData => {
+            Header => [ 'ID', 'Name', ],
+            Body   => [ map { [ $_->{ChatChannelID}, $_->{Name}, ] } @Items ],
         },
+        Indention => 2,
     );
+
+    $Self->Print("$FormattedOutput");
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();
