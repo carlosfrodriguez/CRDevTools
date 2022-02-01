@@ -61,9 +61,9 @@ sub Run {
         $SearchOptions{What} = $Self->GetOption('text');
     }
 
+    no warnings qw(once);    ## no critic
     my $FAQObject = $Kernel::OM->Get('Kernel::System::FAQ');
 
-    # Search all tickets
     my @FAQIDs = $FAQObject->FAQSearch(
         Result           => 'ARRAY',
         UserID           => 1,
@@ -78,17 +78,15 @@ sub Run {
 
         next FAQID if !$FAQID;
 
-        # Get FAQ details
         my %FAQ = $FAQObject->FAQGet(
             ItemID => $FAQID,
             UserID => 1,
         );
         next FAQID if !%FAQ;
 
-        # Prepare FAQ information
+        # Prepare FAQ information.
         $FAQ{Number} //= '--';
 
-        # store ticket details
         push @Items, \%FAQ;
     }
 
@@ -99,21 +97,15 @@ sub Run {
         return $Self->ExitCodeOk();
     }
 
-    my %ColumnLength = (
-        ItemID => 20,
-        Number => 20,
-        Title  => 24,
+    my $FormattedOutput = $Self->TableOutput(
+        TableData => {
+            Header => [ 'ItemID', 'Number', 'Title', ],
+            Body   => [ map { [ $_->{ItemID}, $_->{Number}, $_->{Title}, ] } @Items ],
+        },
+        Indention => 2,
     );
 
-    $Self->OutputTable(
-        Items        => \@Items,
-        Columns      => [ 'ItemID', 'Number', 'Title', ],
-        ColumnLength => {
-            ItemID => 20,
-            Number => 20,
-            Title  => 24,
-        },
-    );
+    $Self->Print("$FormattedOutput");
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();

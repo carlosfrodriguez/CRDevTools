@@ -73,6 +73,7 @@ sub Run {
 
     $Self->Print("<yellow>Deleting FAQ items...</yellow>\n");
 
+    no warnings qw(once);    ## no critic
     my $FAQObject = $Kernel::OM->Get('Kernel::System::FAQ');
 
     my @FAQIDs;
@@ -86,7 +87,6 @@ sub Run {
     }
     elsif ( $Self->GetOption('clean-system') ) {
 
-        # search all FAQs
         my @FAQIDsRaw = $FAQObject->FAQSearch(
             Result           => 'ARRAY',
             UserID           => 1,
@@ -110,32 +110,27 @@ sub Run {
 
         next FAQID if !$FAQID;
 
-        # get FAQ details
         my %FAQ = $FAQObject->FAQGet(
             ItemID => $FAQID,
             UserID => 1,
         );
-
-        # check if FAQ exists
         if ( !%FAQ ) {
             $Self->PrintError("The FAQ with ID $FAQID does not exist!\n");
             $Failed = 1;
             next FAQID;
         }
 
-        # delete FAQ
         my $Success = $FAQObject->FAQDelete(
             ItemID => $FAQID,
             UserID => 1,
         );
-
         if ( !$Success ) {
             $Self->Print("<red>Can't delete FAQ $FAQID</red>\n");
             $Failed = 1;
+            next FAQID;
         }
-        else {
-            $Self->Print(" Deleted FAQ $FAQID\n");
-        }
+
+        $Self->Print(" Deleted FAQ $FAQID\n");
     }
 
     if ($Failed) {

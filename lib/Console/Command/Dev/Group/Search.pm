@@ -29,7 +29,7 @@ sub Configure {
 
     $Self->AddOption(
         Name        => 'name',
-        Description => "Search Groups with specified Group name e.g. *MyGroup*.",
+        Description => "Search groups with specified Group name e.g. *MyGroup*.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -64,27 +64,23 @@ sub Run {
 
     my @ItemIDs = sort { $a <=> $b } keys %List;
 
-    # to store all item details
     my @Items;
 
-    # get Group object
     my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
 
     ITEM:
     for my $ItemID (@ItemIDs) {
         next ITEM if !$ItemID;
 
-        # get item details
         my %Item = $GroupObject->GroupGet(
             ID     => $ItemID,
             UserID => 1,
         );
         next ITEM if !%Item;
 
-        # prepare Group information
+        # Prepare Group information.
         $Item{ID} = $Item{ID} || '';
 
-        # store item details
         push @Items, \%Item,;
     }
 
@@ -95,14 +91,15 @@ sub Run {
         return $Self->ExitCodeOk();
     }
 
-    $Self->OutputTable(
-        Items        => \@Items,
-        Columns      => [ 'ID', 'Name', ],
-        ColumnLength => {
-            ID   => 7,
-            Name => 20,
+    my $FormattedOutput = $Self->TableOutput(
+        TableData => {
+            Header => [ 'ID', 'Name', ],
+            Body   => [ map { [ $_->{ID}, $_->{Name}, ] } @Items ],
         },
+        Indention => 2,
     );
+
+    $Self->Print("$FormattedOutput");
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();

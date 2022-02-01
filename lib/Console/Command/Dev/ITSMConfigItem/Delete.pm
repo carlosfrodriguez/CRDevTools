@@ -64,7 +64,7 @@ sub PreRun {
     }
 
     if ( $OptionsCounter > 1 ) {
-        die("Only one option (name or id) can be used at a time!\n");
+        die("Only one option (name, id or id-range) can be used at a time!\n");
     }
 
     return;
@@ -117,20 +117,16 @@ sub Run {
         my %Item = $ITSMConfigItemObject->ConfigItemGet(
             ConfigItemID => $ItemID,
         );
-
-        # Check if item exists.
         if ( !%Item ) {
             $Self->PrintError("The ITSM config item with ConfigItemID $ItemID does not exist!\n");
             $Failed = 1;
             next ITEMID;
         }
 
-        # Delete config item.
         my $Success = $ITSMConfigItemObject->ConfigItemDelete(
             ConfigItemID => $ItemID,
             UserID       => 1,
         );
-
         if ( !$Success ) {
             $Self->PrintError("Can't delete ITSM config item $ItemID!\n");
             $Failed = 1;

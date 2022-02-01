@@ -97,13 +97,10 @@ sub Run {
 
         next ITEMID if !$ItemID;
 
-        # get item details
         my %Item = $PriorityObject->PriorityGet(
             PriorityID => $ItemID,
             UserID     => 1,
         );
-
-        # check if item exists
         if ( !%Item ) {
             $Self->PrintError("The Priority with ID $ItemID does not exist!\n");
             $Failed = 1;
@@ -119,21 +116,20 @@ sub Run {
 
         if ( $Self->GetOption('delete-tickets') ) {
 
+            TICKETID:
             for my $TicketID (@TicketIDs) {
 
-                # delete ticket
                 my $Success = $TicketObject->TicketDelete(
                     TicketID => $TicketID,
                     UserID   => 1,
                 );
-
                 if ($Success) {
                     $Self->Print("  Ticket $TicketID deleted as it was used by Priority <yellow>$ItemID</yellow>\n");
+                    next TICKETID;
                 }
-                else {
-                    $Self->PrintError("Can't delete ticket $TicketID\n");
-                    $Failed = 1;
-                }
+
+                $Self->PrintError("Can't delete ticket $TicketID\n");
+                $Failed = 1;
             }
         }
         elsif (@TicketIDs) {
@@ -145,12 +141,11 @@ sub Run {
             next ITEMID;
         }
 
-        # delete Priority
+        # Delete Priority.
         my $Success = $DevPriorityObject->PriorityDelete(
             PriorityID => $ItemID,
             UserID     => 1,
         );
-
         if ( !$Success ) {
             $Self->PrintError("Can't delete Priority $ItemID!\n");
             $Failed = 1;
@@ -167,7 +162,6 @@ sub Run {
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();
-
 }
 
 1;

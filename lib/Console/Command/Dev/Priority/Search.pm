@@ -29,7 +29,7 @@ sub Configure {
 
     $Self->AddOption(
         Name        => 'name',
-        Description => "Search Priorities with specified Priority name e.g. *MyPriority*.",
+        Description => "Search Priorities with specified priority name e.g. *MyPriority*.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -64,27 +64,23 @@ sub Run {
 
     my @ItemIDs = sort { $a <=> $b } keys %List;
 
-    # to store all item details
     my @Items;
 
-    # get Priority object
     my $PriorityObject = $Kernel::OM->Get('Kernel::System::Priority');
 
     ITEM:
     for my $ItemID (@ItemIDs) {
         next ITEM if !$ItemID;
 
-        # get item details
         my %Item = $PriorityObject->PriorityGet(
             PriorityID => $ItemID,
             UserID     => 1,
         );
         next ITEM if !%Item;
 
-        # prepare Priority information
+        # Prepare priority information.
         $Item{ID} = $Item{ID} || '';
 
-        # store item details
         push @Items, \%Item,;
     }
 
@@ -95,14 +91,15 @@ sub Run {
         return $Self->ExitCodeOk();
     }
 
-    $Self->OutputTable(
-        Items        => \@Items,
-        Columns      => [ 'ID', 'Name', ],
-        ColumnLength => {
-            ID   => 7,
-            Name => 20,
+    my $FormattedOutput = $Self->TableOutput(
+        TableData => {
+            Header => [ 'ID', 'Name', ],
+            Body   => [ map { [ $_->{ID}, $_->{Name}, ] } @Items ],
         },
+        Indention => 2,
     );
+
+    $Self->Print("$FormattedOutput");
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();

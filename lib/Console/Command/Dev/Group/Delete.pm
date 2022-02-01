@@ -26,10 +26,10 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Delete one or more ticket Groups.');
+    $Self->Description('Delete one or more Groups.');
     $Self->AddOption(
         Name        => 'id',
-        Description => "Specify one or more Group ids of Groups to be deleted.",
+        Description => "Specify one or more group ids of groups to be deleted.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/\d+/smx,
@@ -37,7 +37,7 @@ sub Configure {
     );
     $Self->AddOption(
         Name        => 'id-range',
-        Description => "Specify a range of Group ids to be deleted. (e.g. 1..10)",
+        Description => "Specify a range of group ids to be deleted. (e.g. 1..10)",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/\d+\.\.\d+/smx,
@@ -91,36 +91,31 @@ sub Run {
 
         next ITEMID if !$ItemID;
 
-        # get item details
         my %Item = $GroupObject->GroupGet(
             ID     => $ItemID,
             UserID => 1,
         );
-
-        # check if item exists
         if ( !%Item ) {
-            $Self->PrintError("The Group with ID $ItemID does not exist!\n");
+            $Self->PrintError("The group with ID $ItemID does not exist!\n");
             $Failed = 1;
             next ITEMID;
         }
 
-        # delete Group
         my $Success = $DevGroupObject->GroupDelete(
             GroupID => $ItemID,
             UserID  => 1,
         );
-
         if ( !$Success ) {
-            $Self->PrintError("Can't delete Group $ItemID!\n");
+            $Self->PrintError("Can't delete group $ItemID!\n");
             $Failed = 1;
             next ITEMID;
         }
 
-        $Self->Print("  Deleted Group <yellow>$ItemID</yellow>\n");
+        $Self->Print("  Deleted group <yellow>$ItemID</yellow>\n");
     }
 
     if ($Failed) {
-        $Self->PrintError("Not all Groups where deleted\n");
+        $Self->PrintError("Not all groups where deleted\n");
         return $Self->ExitCodeError();
     }
 

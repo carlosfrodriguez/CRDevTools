@@ -57,7 +57,7 @@ sub Run {
         $SearchOptions{Name} = $Self->GetOption('name');
     }
     if ( $Self->GetOption('number') ) {
-        $SearchOptions{Number} = $Self->GetOption('id');
+        $SearchOptions{Number} = $Self->GetOption('number');
     }
 
     no warnings 'once';    ## no critic
