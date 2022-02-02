@@ -72,15 +72,14 @@ sub Run {
 
     my @Items;
 
-    ITEM:
-    for my $ItemID ( @{ $ItemIDs || [] } ) {
+    ITEMID: for my $ItemID ( @{ $ItemIDs || [] } ) {
 
-        next ITEM if !$ItemID;
+        next ITEMID if !$ItemID;
 
         my $Item = $ITSMConfigItemObject->ConfigItemGet(
             ConfigItemID => $ItemID,
         );
-        next ITEM if ref $Item ne 'HASH';
+        next ITEMID if ref $Item ne 'HASH';
 
         my $VersionRef = $ITSMConfigItemObject->VersionGet(
             ConfigItemID => $ItemID,

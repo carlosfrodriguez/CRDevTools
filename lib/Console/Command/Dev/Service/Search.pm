@@ -29,7 +29,7 @@ sub Configure {
 
     $Self->AddOption(
         Name        => 'name',
-        Description => "Search Services with specified Service name e.g. *MyService*.",
+        Description => "Search services with specified service name e.g. *MyService*.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -65,46 +65,41 @@ sub Run {
 
     my @ItemIDs = sort { $a <=> $b } keys %List;
 
-    # to store all item details
     my @Items;
 
-    # get Service object
     my $ServiceObject = $Kernel::OM->Get('Kernel::System::Service');
 
-    ITEM:
+    ITEMID:
     for my $ItemID (@ItemIDs) {
+        next ITEMID if !$ItemID;
 
-        next ITEM if !$ItemID;
-
-        # get item details
         my %Item = $ServiceObject->ServiceGet(
             ServiceID => $ItemID,
             UserID    => 1,
         );
-        next ITEM if !%Item;
+        next ITEMID if !%Item;
 
-        # prepare Service information
         $Item{ID} = $Item{ServiceID} || '';
 
-        # store item details
         push @Items, \%Item,;
     }
 
     if ( !@Items ) {
-        $Self->Print("No Services found\n");
+        $Self->Print("No services found\n");
 
         $Self->Print("<green>Done.</green>\n");
         return $Self->ExitCodeOk();
     }
 
-    $Self->OutputTable(
-        Items        => \@Items,
-        Columns      => [ 'ID', 'Name', ],
-        ColumnLength => {
-            ID   => 7,
-            Name => 20,
+    my $FormattedOutput = $Self->TableOutput(
+        TableData => {
+            Header => [ 'ID', 'Name', ],
+            Body   => [ map { [ $_->{ID}, $_->{Name} ] } @Items ],
         },
+        Indention => 2,
     );
+
+    $Self->Print("$FormattedOutput");
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();

@@ -81,15 +81,15 @@ sub Run {
 
     my @Items;
 
-    ITEM:
+    ITEMID:
     for my $ItemID ( sort { $a cmp $b } @{ $ItemIDs || [] } ) {
 
-        next ITEM if !$ItemID;
+        next ITEMID if !$ItemID;
 
         my %Item = $CustomerCompanyObject->CustomerCompanyGet(
             CustomerID => $ItemID,
         );
-        next ITEM if !%Item;
+        next ITEMID if !%Item;
 
         # Prepare CustomerCompany information.
         $Item{Name} = $Item{CustomerCompanyName} || '';

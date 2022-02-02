@@ -29,7 +29,7 @@ sub Configure {
     $Self->Description('Delete one or more ticket states.');
     $Self->AddOption(
         Name        => 'id',
-        Description => "Specify one or more State ids of States to be deleted.",
+        Description => "Specify one or more state ids of states to be deleted.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/\d+/smx,
@@ -37,7 +37,7 @@ sub Configure {
     );
     $Self->AddOption(
         Name        => 'id-range',
-        Description => "Specify a range of State ids to be deleted. (e.g. 1..10)",
+        Description => "Specify a range of state ids to be deleted. (e.g. 1..10)",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/\d+\.\.\d+/smx,
@@ -45,7 +45,7 @@ sub Configure {
     );
     $Self->AddOption(
         Name        => 'delete-tickets',
-        Description => "also remove all associated tickets with deleted States",
+        Description => "also remove all associated tickets with deleted states",
         Required    => 0,
         HasValue    => 0,
     );
@@ -97,15 +97,12 @@ sub Run {
 
         next ITEMID if !$ItemID;
 
-        # get item details
         my %Item = $StateObject->StateGet(
             ID     => $ItemID,
             UserID => 1,
         );
-
-        # check if item exists
         if ( !%Item ) {
-            $Self->PrintError("The State with ID $ItemID does not exist!\n");
+            $Self->PrintError("The state with ID $ItemID does not exist!\n");
             $Failed = 1;
             next ITEMID;
         }
@@ -119,27 +116,26 @@ sub Run {
 
         if ( $Self->GetOption('delete-tickets') ) {
 
+            TICKETID:
             for my $TicketID (@TicketIDs) {
 
-                # delete ticket
                 my $Success = $TicketObject->TicketDelete(
                     TicketID => $TicketID,
                     UserID   => 1,
                 );
-
-                if ($Success) {
-                    $Self->Print("  Ticket $TicketID deleted as it was used by State <yellow>$ItemID</yellow>\n");
-                }
-                else {
+                if ( !$Success ) {
                     $Self->PrintError("Can't delete ticket $TicketID\n");
                     $Failed = 1;
+                    next TICKETID;
                 }
+
+                $Self->Print("  Ticket $TicketID deleted as it was used by state <yellow>$ItemID</yellow>\n");
             }
         }
         elsif (@TicketIDs) {
-            $Self->PrintError("Could not delete State $ItemID due the following tickets use it:\n");
+            $Self->PrintError("Could not delete state $ItemID due the following tickets use it:\n");
             for my $TicketID (@TicketIDs) {
-                $Self->Print("  Used by Ticket <red>$TicketID</red>\n");
+                $Self->Print("  Used by ticket <red>$TicketID</red>\n");
                 $Failed = 1;
             }
             next ITEMID;
@@ -152,16 +148,16 @@ sub Run {
         );
 
         if ( !$Success ) {
-            $Self->PrintError("Can't delete State $ItemID!\n");
+            $Self->PrintError("Can't delete state $ItemID!\n");
             $Failed = 1;
             next ITEMID;
         }
 
-        $Self->Print("  Deleted State <yellow>$ItemID</yellow>\n");
+        $Self->Print("  Deleted state <yellow>$ItemID</yellow>\n");
     }
 
     if ($Failed) {
-        $Self->PrintError("Not all States where deleted\n");
+        $Self->PrintError("Not all states where deleted\n");
         return $Self->ExitCodeError();
     }
 

@@ -72,6 +72,7 @@ sub Run {
         $SearchOptions{Search} = $Self->GetOption('full-text');
     }
 
+    no warnings qw(once);    ## no critic
     my $UserObject = $Kernel::OM->Get('Kernel::System::User');
 
     if (%SearchOptions) {
@@ -92,17 +93,16 @@ sub Run {
     # to store all item details
     my @Items;
 
-    ITEM:
+    ITEMID:
     for my $ItemID (@ItemIDs) {
-
-        next ITEM if !$ItemID;
+        next ITEMID if !$ItemID;
 
         # get item details
         my %Item = $UserObject->GetUserData(
             UserID => $ItemID,
         );
 
-        next ITEM if !%Item;
+        next ITEMID if !%Item;
 
         # prepare User information
         $Item{ID}    = $Item{UserID}    || '';

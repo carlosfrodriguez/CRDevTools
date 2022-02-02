@@ -95,16 +95,16 @@ sub Run {
 
     my @Items;
 
-    ITEM:
+    ITEMID:
     for my $ItemID (@ItemIDs) {
 
-        next ITEM if !$ItemID;
+        next ITEMID if !$ItemID;
 
         # get item details
         my %Item = $CustomerUserObject->CustomerUserDataGet(
             User => $ItemID,
         );
-        next ITEM if !%Item;
+        next ITEMID if !%Item;
 
         # prepare CustomerUser information
         $Item{Login} = $Item{UserLogin} || '';

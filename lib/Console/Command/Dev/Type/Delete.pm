@@ -26,10 +26,10 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Delete one or more ticket types.');
+    $Self->Description('Delete one or more Ticket Types.');
     $Self->AddOption(
         Name        => 'id',
-        Description => "Specify one or more Type ids of Types to be deleted.",
+        Description => "Specify one or more type ids of types to be deleted.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/\d+/smx,
@@ -97,15 +97,12 @@ sub Run {
 
         next ITEMID if !$ItemID;
 
-        # get item details
         my %Item = $TypeObject->TypeGet(
             ID     => $ItemID,
             UserID => 1,
         );
-
-        # check if item exists
         if ( !%Item ) {
-            $Self->PrintError("The Type with ID $ItemID does not exist!\n");
+            $Self->PrintError("The type with ID $ItemID does not exist!\n");
             $Failed = 1;
             next ITEMID;
         }
@@ -119,27 +116,27 @@ sub Run {
 
         if ( $Self->GetOption('delete-tickets') ) {
 
+            TICKETID:
             for my $TicketID (@TicketIDs) {
 
-                # delete ticket
+                # Delete ticket.
                 my $Success = $TicketObject->TicketDelete(
                     TicketID => $TicketID,
                     UserID   => 1,
                 );
-
-                if ($Success) {
-                    $Self->Print("  Ticket $TicketID deleted as it was used by Type <yellow>$ItemID</yellow>\n");
-                }
-                else {
+                if ( !$Success ) {
                     $Self->PrintError("Can't delete ticket $TicketID\n");
                     $Failed = 1;
+                    next TICKETID;
                 }
+
+                $Self->Print("  Ticket $TicketID deleted as it was used by type <yellow>$ItemID</yellow>\n");
             }
         }
         elsif (@TicketIDs) {
-            $Self->PrintError("Could not delete Type $ItemID due the following tickets use it:\n");
+            $Self->PrintError("Could not delete type $ItemID due the following tickets use it:\n");
             for my $TicketID (@TicketIDs) {
-                $Self->Print("  Used by Ticket <red>$TicketID</red>\n");
+                $Self->Print("  Used by ticket <red>$TicketID</red>\n");
                 $Failed = 1;
             }
             next ITEMID;
@@ -152,16 +149,16 @@ sub Run {
         );
 
         if ( !$Success ) {
-            $Self->PrintError("Can't delete Type $ItemID!\n");
+            $Self->PrintError("Can't delete type $ItemID!\n");
             $Failed = 1;
             next ITEMID;
         }
 
-        $Self->Print("  Deleted Type <yellow>$ItemID</yellow>\n");
+        $Self->Print("  Deleted type <yellow>$ItemID</yellow>\n");
     }
 
     if ($Failed) {
-        $Self->PrintError("Not all Types where deleted\n");
+        $Self->PrintError("Not all types where deleted\n");
         return $Self->ExitCodeError();
     }
 

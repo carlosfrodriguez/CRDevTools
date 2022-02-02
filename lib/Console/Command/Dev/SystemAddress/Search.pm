@@ -82,15 +82,14 @@ sub Run {
 
     my $SystemAddressObject = $Kernel::OM->Get('Kernel::System::SystemAddress');
 
-    ITEM:
+    ITEMID:
     for my $ItemID (@ItemIDs) {
-
-        next ITEM if !$ItemID;
+        next ITEMID if !$ItemID;
 
         my %Item = $SystemAddressObject->SystemAddressGet(
             ID => $ItemID,
         );
-        next ITEM if !%Item;
+        next ITEMID if !%Item;
 
         # Prepare system address information.
         $Item{ID}    = $Item{ID}       || '';

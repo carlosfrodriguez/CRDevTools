@@ -87,10 +87,10 @@ sub Run {
     # to store all item details
     my @Items;
 
-    ITEM:
+    ITEMID:
     for my $ItemID (@ItemIDs) {
 
-        next ITEM if !$ItemID;
+        next ITEMID if !$ItemID;
 
         my $Item;
 
@@ -99,7 +99,7 @@ sub Run {
             my $FieldObject = $DynamicFieldObject->FieldGet(
                 ID => $ItemID,
             );
-            next ITEM if !$FieldObject;
+            next ITEMID if !$FieldObject;
 
             $Item->{ID}     = $FieldObject->ID();
             $Item->{Name}   = $FieldObject->Name();
@@ -112,7 +112,7 @@ sub Run {
                 UserID => 1,
             );
         }
-        next ITEM if !$Item;
+        next ITEMID if !$Item;
 
         push @Items, $Item,;
     }

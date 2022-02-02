@@ -29,7 +29,7 @@ sub Configure {
     $Self->Description('Delete one or more Roles.');
     $Self->AddOption(
         Name        => 'id',
-        Description => "Specify one or more Role ids of Roles to be deleted.",
+        Description => "Specify one or more role ids of Roles to be deleted.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/\d+/smx,
@@ -37,7 +37,7 @@ sub Configure {
     );
     $Self->AddOption(
         Name        => 'id-range',
-        Description => "Specify a range of Role ids to be deleted. (e.g. 1..10)",
+        Description => "Specify a range of role ids to be deleted. (e.g. 1..10)",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/\d+\.\.\d+/smx,
@@ -97,7 +97,7 @@ sub Run {
         );
 
         if ( !%Item ) {
-            $Self->PrintError("The Role with ID $ItemID does not exist!\n");
+            $Self->PrintError("The role with ID $ItemID does not exist!\n");
             $Failed = 1;
             next ITEMID;
         }
@@ -109,16 +109,16 @@ sub Run {
         );
 
         if ( !$Success ) {
-            $Self->PrintError("Can't delete Role $ItemID!\n");
+            $Self->PrintError("Can't delete role $ItemID!\n");
             $Failed = 1;
             next ITEMID;
         }
 
-        $Self->Print("  Deleted Role <yellow>$ItemID</yellow>\n");
+        $Self->Print("  Deleted role <yellow>$ItemID</yellow>\n");
     }
 
     if ($Failed) {
-        $Self->PrintError("Not all Roles where deleted\n");
+        $Self->PrintError("Not all roles where deleted\n");
         return $Self->ExitCodeError();
     }
 

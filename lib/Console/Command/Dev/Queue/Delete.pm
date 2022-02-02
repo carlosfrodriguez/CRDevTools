@@ -114,15 +114,12 @@ sub Run {
         my $Queue = $QueueObject->QueueLookup(
             QueueID => $ItemID,
         );
-
-        # check if item exists
         if ( !$Queue ) {
             $Self->PrintError("The Queue with ID $ItemID does not exist!\n");
             $Failed = 1;
             next ITEMID;
         }
 
-        # get item details
         my %Item = $QueueObject->QueueGet(
             ID => $ItemID,
         );
@@ -136,25 +133,24 @@ sub Run {
 
         if ( $Self->GetOption('delete-tickets') ) {
 
+            TICKETID:
             for my $TicketID (@TicketIDs) {
 
-                # delete ticket
                 my $Success = $TicketObject->TicketDelete(
                     TicketID => $TicketID,
                     UserID   => 1,
                 );
-
-                if ($Success) {
-                    $Self->Print("  Ticket $TicketID deleted as it was used by Queue <yellow>$ItemID</yellow>\n");
-                }
-                else {
+                if ( !$Success ) {
                     $Self->PrintError("Can't delete ticket $TicketID\n");
                     $Failed = 1;
+                    next TICKETID;
                 }
+
+                $Self->Print("  Ticket $TicketID deleted as it was used by queue <yellow>$ItemID</yellow>\n");
             }
         }
         elsif (@TicketIDs) {
-            $Self->PrintError("Could not delete Queue $ItemID due the following tickets use it:\n");
+            $Self->PrintError("Could not delete queue $ItemID due the following tickets use it:\n");
             for my $TicketID (@TicketIDs) {
                 $Self->Print("  Used by Ticket <red>$TicketID</red>\n");
                 $Failed = 1;
@@ -162,19 +158,18 @@ sub Run {
             next ITEMID;
         }
 
-        # delete queue
         my $Success = $DevQueueObject->QueueDelete(
             QueueID => $ItemID,
             UserID  => 1,
         );
 
         if ( !$Success ) {
-            $Self->PrintError("Can't delete Queue $ItemID!\n");
+            $Self->PrintError("Can't delete queue $ItemID!\n");
             $Failed = 1;
             next ITEMID;
         }
 
-        $Self->Print("  Deleted Queue <yellow>$ItemID</yellow>\n");
+        $Self->Print("  Deleted queue <yellow>$ItemID</yellow>\n");
     }
 
     if ($Failed) {

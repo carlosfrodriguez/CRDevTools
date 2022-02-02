@@ -24,7 +24,7 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Delete one or more tickets.');
+    $Self->Description('Delete one or more Tickets.');
     $Self->AddOption(
         Name        => 'id',
         Description => "Specify one or more ticket ids of tickets to be deleted.",
@@ -73,6 +73,7 @@ sub Run {
 
     $Self->Print("<yellow>Deleting tickets...</yellow>\n");
 
+    no warnings qw(once);    ## no critic
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
     my @TicketIDs;
@@ -86,7 +87,7 @@ sub Run {
     }
     elsif ( $Self->GetOption('clean-system') ) {
 
-        # search all tickets
+        # Search all tickets.
         my @TicketIDsRaw = $TicketObject->TicketSearch(
             Result  => 'ARRAY',
             UserID  => 1,
@@ -94,7 +95,7 @@ sub Run {
             OrderBy => 'Up',
         );
 
-        # remove welcome ticket
+        # Remove welcome ticket.
         @TicketIDs = grep { $_ != 1 } @TicketIDsRaw;
     }
 
@@ -110,32 +111,27 @@ sub Run {
 
         next TICKETID if !$TicketID;
 
-        # get ticket details
         my %Ticket = $TicketObject->TicketGet(
             TicketID => $TicketID,
             UserID   => 1,
         );
-
-        # check if ticket exists
         if ( !%Ticket ) {
             $Self->PrintError("The ticket with ID $TicketID does not exist!\n");
             $Failed = 1;
             next TICKETID;
         }
 
-        # delete ticket
         my $Success = $TicketObject->TicketDelete(
             TicketID => $TicketID,
             UserID   => 1,
         );
-
         if ( !$Success ) {
             $Self->PrintError("Can't delete ticket $TicketID\n");
             $Failed = 1;
+            next TICKETID;
         }
-        else {
-            $Self->Print(" Deleted ticket $TicketID\n");
-        }
+
+        $Self->Print(" Deleted ticket $TicketID\n");
     }
 
     if ($Failed) {

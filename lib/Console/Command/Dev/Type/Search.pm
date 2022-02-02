@@ -25,11 +25,11 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Search Types in the system.');
+    $Self->Description('Search Ticket Types in the system.');
 
     $Self->AddOption(
         Name        => 'name',
-        Description => "Search Types with specified Type name e.g. *MyType*.",
+        Description => "Search types with specified type name e.g. *MyType*.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -47,7 +47,7 @@ sub Run {
 
     my %List;
 
-    # Type name search
+    # Type name search.
     if ( $Self->GetOption('name') ) {
         $SearchOptions{Name} = $Self->GetOption('name');
         %List = $Kernel::OM->Get('Dev::Type')->TypeSearch(
@@ -64,45 +64,42 @@ sub Run {
 
     my @ItemIDs = sort { $a <=> $b } keys %List;
 
-    # to store all item details
     my @Items;
 
-    # get Type object
     my $TypeObject = $Kernel::OM->Get('Kernel::System::Type');
 
-    ITEM:
+    ITEMID:
     for my $ItemID (@ItemIDs) {
-        next ITEM if !$ItemID;
+        next ITEMID if !$ItemID;
 
-        # get item details
         my %Item = $TypeObject->TypeGet(
             ID     => $ItemID,
             UserID => 1,
         );
-        next ITEM if !%Item;
+        next ITEMID if !%Item;
 
         # prepare Type information
         $Item{ID} = $Item{ID} || '';
 
-        # store item details
-        push @Items, \%Item,;
+        push @Items, \%Item;
     }
 
     if ( !@Items ) {
-        $Self->Print("No Types found\n");
+        $Self->Print("No types found\n");
 
         $Self->Print("<green>Done.</green>\n");
         return $Self->ExitCodeOk();
     }
 
-    $Self->OutputTable(
-        Items        => \@Items,
-        Columns      => [ 'ID', 'Name', ],
-        ColumnLength => {
-            ID   => 7,
-            Name => 20,
+    my $FormattedOutput = $Self->TableOutput(
+        TableData => {
+            Header => [ 'ID', 'Name', ],
+            Body   => [ map { [ $_->{ID}, $_->{Name} ] } @Items ],
         },
+        Indention => 2,
     );
+
+    $Self->Print("$FormattedOutput");
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();

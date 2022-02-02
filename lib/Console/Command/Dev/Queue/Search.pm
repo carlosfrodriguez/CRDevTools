@@ -41,7 +41,7 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Listing queues...</yellow>\n");
+    $Self->Print("<yellow>Listing Queues...</yellow>\n");
 
     my %SearchOptions;
 
@@ -70,21 +70,18 @@ sub Run {
     # get Queue object
     my $QueueObject = $Kernel::OM->Get('Kernel::System::Queue');
 
-    ITEM:
+    ITEMID:
     for my $ItemID (@ItemIDs) {
+        next ITEMID if !$ItemID;
 
-        next ITEM if !$ItemID;
-
-        # get item details
         my %Item = $QueueObject->QueueGet(
             ID => $ItemID,
         );
-        next ITEM if !%Item;
+        next ITEMID if !%Item;
 
-        # prepare queue information
+        # Prepare queue information.
         $Item{ID} = $Item{QueueID} || '';
 
-        # store item details
         push @Items, \%Item,;
     }
 
@@ -95,14 +92,15 @@ sub Run {
         return $Self->ExitCodeOk();
     }
 
-    $Self->OutputTable(
-        Items        => \@Items,
-        Columns      => [ 'ID', 'Name', ],
-        ColumnLength => {
-            ID   => 7,
-            Name => 20,
+    my $FormattedOutput = $Self->TableOutput(
+        TableData => {
+            Header => [ 'ID', 'Name', ],
+            Body   => [ map { [ $_->{ID}, $_->{Name}, ] } @Items ],
         },
+        Indention => 2,
     );
+
+    $Self->Print("$FormattedOutput");
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();

@@ -24,7 +24,7 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Archive one or more tickets.');
+    $Self->Description('Archive one or more Tickets.');
     $Self->AddOption(
         Name        => 'id',
         Description => "Specify one or more ticket ids of tickets to be archived.",
@@ -85,6 +85,7 @@ sub Run {
         $Self->Print("<yellow>Restoring archived tickets...</yellow>\n");
     }
 
+    no warnings qw(once);    ## no critic
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
     my @TicketIDs;
@@ -109,13 +110,10 @@ sub Run {
 
         next TICKETID if !$TicketID;
 
-        # get ticket details
         my %Ticket = $TicketObject->TicketGet(
             TicketID => $TicketID,
             UserID   => 1,
         );
-
-        # check if ticket exists
         if ( !%Ticket ) {
             $Self->PrintError("The ticket with ID $TicketID does not exist!\n");
             $Failed = 1;
@@ -135,31 +133,19 @@ sub Run {
         );
 
         if ( !$Success ) {
-            if ( $ArchiveFlag eq 'y' ) {
-                $Self->PrintError("Can't archive ticket $TicketID\n");
-            }
-            else {
-                $Self->PrintError("Can't restore ticket $TicketID\n");
-            }
+            my $ActionStr = $ArchiveFlag eq 'y' ? 'archive' : 'restore';
+            $Self->PrintError("Can't $ActionStr ticket $TicketID\n");
             $Failed = 1;
+            next TICKETID;
         }
-        else {
-            if ( $ArchiveFlag eq 'y' ) {
-                $Self->Print(" Archived ticket $TicketID\n");
-            }
-            else {
-                $Self->Print(" Restored ticket $TicketID\n");
-            }
-        }
+
+        my $ActionStr = $ArchiveFlag eq 'y' ? 'Archived' : 'Restored';
+        $Self->Print(" $ActionStr ticket $TicketID\n");
     }
 
     if ($Failed) {
-        if ( $ArchiveFlag eq 'y' ) {
-            $Self->PrintError("Not all tickets where archived\n");
-        }
-        else {
-            $Self->PrintError("Not all tickets where restored\n");
-        }
+        my $ActionStr = $ArchiveFlag eq 'y' ? 'archived' : 'restored';
+        $Self->PrintError("Not all tickets where $ActionStr\n");
         return $Self->ExitCodeError();
     }
 

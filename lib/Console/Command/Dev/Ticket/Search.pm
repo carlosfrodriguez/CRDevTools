@@ -25,7 +25,7 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Search tickets in the system.');
+    $Self->Description('Search Tickets in the system.');
 
     $Self->AddOption(
         Name        => 'ticket-number',
@@ -69,28 +69,28 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Listing tickets...</yellow>\n");
+    $Self->Print("<yellow>Listing Tickets...</yellow>\n");
 
     my %SearchOptions = (
         ArchiveFlags => [ 'y', 'n' ],
     );
 
-    # ticket number search
+    # Ticket number search.
     if ( $Self->GetOption('ticket-number') ) {
         $SearchOptions{TicketNumber} = $Self->GetOption('ticket-number');
     }
 
-    # title search
+    # Title search.
     if ( $Self->GetOption('ticket-title') ) {
         $SearchOptions{Title} = $Self->GetOption('ticket-title');
     }
 
-    # customer search
+    # Customer search.
     if ( $Self->GetOption('ticket-customer') ) {
         $SearchOptions{CustomerUserLogin} = $Self->GetOption('ticket-customer');
     }
 
-    # full text search on From To Cc Subject Body
+    # Full text search on From To Cc Subject Body.
     if ( $Self->GetOption('ticket-full-text') ) {
         $SearchOptions{ContentSearch} = 'OR';
         for my $TicketElement (qw(From To Cc Subject Body)) {
@@ -98,12 +98,12 @@ sub Run {
         }
     }
 
-    # owner ID search
+    # OwnerID search.
     if ( $Self->GetOption('ticket-owner') ) {
 
         my $OwnerLogin = $Self->GetOption('ticket-owner');
 
-        # search by owner needs to have a valid user, do a user lookup and retrieve the UserID
+        # Search by owner needs to have a valid user, do a user lookup and retrieve the UserID.
         my $UserID = $Kernel::OM->Get('Kernel::System::User')->UserLookup(
             UserLogin => $OwnerLogin,
         );
@@ -115,40 +115,36 @@ sub Run {
         $SearchOptions{OwnerIDs} = [$UserID];
     }
 
-    # get ticket object
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
-    # search all tickets
-    my @TicketIDs = $TicketObject->TicketSearch(
+    my @ItemIDs = $TicketObject->TicketSearch(
         Result  => 'ARRAY',
         UserID  => 1,
-        SortBy  => 'Age',
+        SortBy  => 'ID',
         OrderBy => 'Up',
         %SearchOptions,
     );
 
     my @Items;
-    TICKETID:
-    for my $TicketID (@TicketIDs) {
+    ITEMID:
+    for my $ItemID (@ItemIDs) {
 
-        next TICKETID if !$TicketID;
+        next ITEMID if !$ItemID;
 
-        # get ticket details
-        my %Ticket = $TicketObject->TicketGet(
-            TicketID => $TicketID,
+        my %Item = $TicketObject->TicketGet(
+            TicketID => $ItemID,
             UserID   => 1,
         );
-        next TICKETID if !%Ticket;
+        next ITEMID if !%Item;
 
-        # prepare ticket information
-        $Ticket{ID}       = $Ticket{TicketID}       || '';
-        $Ticket{Number}   = $Ticket{TicketNumber}   || '';
-        $Ticket{Owner}    = $Ticket{Owner}          || '';
-        $Ticket{Customer} = $Ticket{CustomerUserID} || '';
-        $Ticket{Title}    = $Ticket{Title}          || '';
+        # Prepare ticket information.
+        $Item{ID}       = $Item{TicketID}       || '';
+        $Item{Number}   = $Item{TicketNumber}   || '';
+        $Item{Owner}    = $Item{Owner}          || '';
+        $Item{Customer} = $Item{CustomerUserID} || '';
+        $Item{Title}    = $Item{Title}          || '';
 
-        # store ticket details
-        push @Items, \%Ticket,;
+        push @Items, \%Item;
     }
 
     if ( !@Items ) {
@@ -158,25 +154,15 @@ sub Run {
         return $Self->ExitCodeOk();
     }
 
-    my %ColumnLength = (
-        ID       => 7,
-        Number   => 20,
-        Owner    => 24,
-        Customer => 30,
-        Title    => 24,
+    my $FormattedOutput = $Self->TableOutput(
+        TableData => {
+            Header => [ 'ID', 'Number', 'Owner', 'Customer', 'Title' ],
+            Body   => [ map { [ $_->{ID}, $_->{Number}, $_->{Owner}, $_->{Customer}, $_->{Title}, ] } @Items ],
+        },
+        Indention => 2,
     );
 
-    $Self->OutputTable(
-        Items        => \@Items,
-        Columns      => [ 'ID', 'Number', 'Owner', 'Customer', 'Title' ],
-        ColumnLength => {
-            ID       => 7,
-            Number   => 20,
-            Owner    => 24,
-            Customer => 30,
-            Title    => 24,
-        },
-    );
+    $Self->Print("$FormattedOutput");
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();

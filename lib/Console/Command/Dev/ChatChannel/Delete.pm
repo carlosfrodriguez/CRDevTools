@@ -114,6 +114,7 @@ sub Run {
 
         if ( $Self->GetOption('delete-chats') ) {
 
+            CHAT:
             for my $Chat (@Chats) {
 
                 my $ChatID = $Chat->{ChatID};
@@ -124,15 +125,14 @@ sub Run {
                     UserID => 1,
                 );
 
-                if ($Success) {
-                    $Self->Print(
-                        "  Chat $ChatID deleted as it was used by $Self->{ItemName} <yellow>$ItemID</yellow>\n"
-                    );
-                }
-                else {
+                if ( !$Success ) {
                     $Self->PrintError("Can't delete chat $ChatID\n");
                     $Failed = 1;
+                    next CHAT;
                 }
+                $Self->Print(
+                    "  Chat $ChatID deleted as it was used by $Self->{ItemName} <yellow>$ItemID</yellow>\n"
+                );
             }
         }
         elsif (@Chats) {

@@ -68,15 +68,15 @@ sub Run {
 
     my $PriorityObject = $Kernel::OM->Get('Kernel::System::Priority');
 
-    ITEM:
+    ITEMID:
     for my $ItemID (@ItemIDs) {
-        next ITEM if !$ItemID;
+        next ITEMID if !$ItemID;
 
         my %Item = $PriorityObject->PriorityGet(
             PriorityID => $ItemID,
             UserID     => 1,
         );
-        next ITEM if !%Item;
+        next ITEMID if !%Item;
 
         # Prepare priority information.
         $Item{ID} = $Item{ID} || '';

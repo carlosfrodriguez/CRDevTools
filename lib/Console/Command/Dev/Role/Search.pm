@@ -29,7 +29,7 @@ sub Configure {
 
     $Self->AddOption(
         Name        => 'name',
-        Description => "Search Roles with specified Role name e.g. *MyRole*.",
+        Description => "Search roles with specified role name e.g. *MyRole*.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -68,24 +68,24 @@ sub Run {
 
     my @Items;
 
-    ITEM:
+    ITEMID:
     for my $ItemID (@ItemIDs) {
-        next ITEM if !$ItemID;
+        next ITEMID if !$ItemID;
 
         my %Item = $GroupObject->RoleGet(
             ID     => $ItemID,
             UserID => 1,
         );
-        next ITEM if !%Item;
+        next ITEMID if !%Item;
 
-        # Prepare Role information.
+        # Prepare role information.
         $Item{ID} = $Item{ID} || '';
 
         push @Items, \%Item,;
     }
 
     if ( !@Items ) {
-        $Self->Print("No Roles found\n");
+        $Self->Print("No roles found\n");
 
         $Self->Print("<green>Done.</green>\n");
         return $Self->ExitCodeOk();

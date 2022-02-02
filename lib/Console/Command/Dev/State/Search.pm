@@ -29,7 +29,7 @@ sub Configure {
 
     $Self->AddOption(
         Name        => 'name',
-        Description => "Search States with specified State name e.g. *MyState*.",
+        Description => "Search states with specified state name e.g. *MyState*.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -64,27 +64,23 @@ sub Run {
 
     my @ItemIDs = sort { $a <=> $b } keys %List;
 
-    # to store all item details
     my @Items;
 
-    # get State object
     my $StateObject = $Kernel::OM->Get('Kernel::System::State');
 
-    ITEM:
+    ITEMID:
     for my $ItemID (@ItemIDs) {
-        next ITEM if !$ItemID;
+        next ITEMID if !$ItemID;
 
-        # get item details
         my %Item = $StateObject->StateGet(
             ID     => $ItemID,
             UserID => 1,
         );
-        next ITEM if !%Item;
+        next ITEMID if !%Item;
 
-        # prepare State information
+        # Prepare State Information
         $Item{ID} = $Item{ID} || '';
 
-        # store item details
         push @Items, \%Item,;
     }
 
@@ -95,14 +91,15 @@ sub Run {
         return $Self->ExitCodeOk();
     }
 
-    $Self->OutputTable(
-        Items        => \@Items,
-        Columns      => [ 'ID', 'Name', ],
-        ColumnLength => {
-            ID   => 7,
-            Name => 20,
+    my $FormattedOutput = $Self->TableOutput(
+        TableData => {
+            Header => [ 'ID', 'Name', ],
+            Body   => [ map { [ $_->{ID}, $_->{Name} ] } @Items ],
         },
+        Indention => 2,
     );
+
+    $Self->Print("$FormattedOutput");
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();

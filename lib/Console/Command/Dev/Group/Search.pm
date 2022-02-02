@@ -68,15 +68,15 @@ sub Run {
 
     my $GroupObject = $Kernel::OM->Get('Kernel::System::Group');
 
-    ITEM:
+    ITEMID:
     for my $ItemID (@ItemIDs) {
-        next ITEM if !$ItemID;
+        next ITEMID if !$ItemID;
 
         my %Item = $GroupObject->GroupGet(
             ID     => $ItemID,
             UserID => 1,
         );
-        next ITEM if !%Item;
+        next ITEMID if !%Item;
 
         # Prepare Group information.
         $Item{ID} = $Item{ID} || '';

@@ -123,13 +123,13 @@ sub Run {
                     TicketID => $TicketID,
                     UserID   => 1,
                 );
-                if ($Success) {
-                    $Self->Print("  Ticket $TicketID deleted as it was used by Priority <yellow>$ItemID</yellow>\n");
+                if ( !$Success ) {
+                    $Self->PrintError("Can't delete ticket $TicketID\n");
+                    $Failed = 1;
                     next TICKETID;
                 }
 
-                $Self->PrintError("Can't delete ticket $TicketID\n");
-                $Failed = 1;
+                $Self->Print("  Ticket $TicketID deleted as it was used by Priority <yellow>$ItemID</yellow>\n");
             }
         }
         elsif (@TicketIDs) {

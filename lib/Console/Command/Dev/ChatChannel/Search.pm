@@ -75,16 +75,16 @@ sub Run {
 
     my @Items;
 
-    ITEM:
+    ITEMID:
     for my $ItemID (@ItemIDs) {
 
-        next ITEM if !$ItemID;
+        next ITEMID if !$ItemID;
 
         my %Item = $ChatChannelObject->ChatChannelGet(
             ChatChannelID => $ItemID,
             UserID        => 1,
         );
-        next ITEM if !%Item;
+        next ITEMID if !%Item;
 
         push @Items, \%Item,;
     }

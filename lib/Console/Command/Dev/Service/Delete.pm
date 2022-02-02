@@ -29,7 +29,7 @@ sub Configure {
     $Self->Description('Delete one or more services.');
     $Self->AddOption(
         Name        => 'id',
-        Description => "Specify one or more Service ids of Services to be deleted.",
+        Description => "Specify one or more service ids of services to be deleted.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/\d+/smx,
@@ -37,7 +37,7 @@ sub Configure {
     );
     $Self->AddOption(
         Name        => 'id-range',
-        Description => "Specify a range of Service ids to be deleted. (e.g. 1..10)",
+        Description => "Specify a range of service ids to be deleted. (e.g. 1..10)",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/\d+\.\.\d+/smx,
@@ -97,13 +97,10 @@ sub Run {
 
         next ITEMID if !$ItemID;
 
-        # get item details
         my %Item = $ServiceObject->ServiceGet(
             ServiceID => $ItemID,
             UserID    => 1,
         );
-
-        # check if item exists
         if ( !%Item ) {
             $Self->PrintError("The Service with ID $ItemID does not exist!\n");
             $Failed = 1;
@@ -119,6 +116,7 @@ sub Run {
 
         if ( $Self->GetOption('delete-tickets') ) {
 
+            TICKETID:
             for my $TicketID (@TicketIDs) {
 
                 # delete ticket
@@ -127,41 +125,39 @@ sub Run {
                     UserID   => 1,
                 );
 
-                if ($Success) {
-                    $Self->Print("  Ticket $TicketID deleted as it was used by Service <yellow>$ItemID</yellow>\n");
-                }
-                else {
+                if ( !$Success ) {
                     $Self->PrintError("Can't delete ticket $TicketID\n");
                     $Failed = 1;
+                    next TICKETID;
                 }
+
+                $Self->Print("  Ticket $TicketID deleted as it was used by Service <yellow>$ItemID</yellow>\n");
             }
         }
         elsif (@TicketIDs) {
-            $Self->PrintError("Could not delete Service $ItemID due the following tickets use it:\n");
+            $Self->PrintError("Could not delete service $ItemID due the following tickets use it:\n");
             for my $TicketID (@TicketIDs) {
-                $Self->Print("  Used by Ticket <red>$TicketID</red>\n");
+                $Self->Print("  Used by ticket <red>$TicketID</red>\n");
                 $Failed = 1;
             }
             next ITEMID;
         }
 
-        # delete Service
         my $Success = $DevServiceObject->ServiceDelete(
             ServiceID => $ItemID,
             UserID    => 1,
         );
-
         if ( !$Success ) {
-            $Self->PrintError("Can't delete Service $ItemID!\n");
+            $Self->PrintError("Can't delete service $ItemID!\n");
             $Failed = 1;
             next ITEMID;
         }
 
-        $Self->Print("  Deleted Service <yellow>$ItemID</yellow>\n");
+        $Self->Print("  Deleted service <yellow>$ItemID</yellow>\n");
     }
 
     if ($Failed) {
-        $Self->PrintError("Not all Services where deleted\n");
+        $Self->PrintError("Not all services where deleted\n");
         return $Self->ExitCodeError();
     }
 

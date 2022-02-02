@@ -26,7 +26,7 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Delete one or more customer users.');
+    $Self->Description('Delete one or more Users.');
     $Self->AddOption(
         Name        => 'id',
         Description => "Specify one or more user ids of users to be deleted.",
@@ -81,7 +81,7 @@ sub PreRun {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Deleting customer users...</yellow>\n");
+    $Self->Print("<yellow>Deleting users...</yellow>\n");
 
     my %SearchOptions;
 
@@ -119,8 +119,8 @@ sub Run {
 
     my $Failed;
 
-    my $DevCustomerUserObject = $Kernel::OM->Get('Dev::User');
-    my $TicketObject          = $Kernel::OM->Get('Kernel::System::Ticket');
+    my $DevUserObject = $Kernel::OM->Get('Dev::User');
+    my $TicketObject  = $Kernel::OM->Get('Kernel::System::Ticket');
 
     ITEMID:
     for my $ItemID (@ItemsToDelete) {
@@ -134,33 +134,33 @@ sub Run {
 
         # check if item exists
         if ( !%Item ) {
-            $Self->PrintError("The User with Login $ItemID does not exist!\n");
+            $Self->PrintError("The user with ID $ItemID does not exist!\n");
             $Failed = 1;
             next ITEMID;
         }
 
-        my @TicketIDs = $DevCustomerUserObject->RelatedTicketsGet(
+        my @TicketIDs = $DevUserObject->RelatedTicketsGet(
             Limit  => 1000,
             UserID => $ItemID,
         );
 
         if ( $Self->GetOption('delete-tickets') ) {
 
+            TICKETID:
             for my $TicketID (@TicketIDs) {
 
-                # delete ticket
+                # Delete ticket
                 my $Success = $TicketObject->TicketDelete(
                     TicketID => $TicketID,
                     UserID   => 1,
                 );
-
-                if ($Success) {
-                    $Self->Print("  Ticket $TicketID deleted as it was used by User <yellow>$ItemID</yellow>\n");
-                }
-                else {
+                if ( !$Success ) {
                     $Self->PrintError("Can't delete ticket $TicketID\n");
                     $Failed = 1;
+                    next TICKETID;
                 }
+
+                $Self->Print("  Ticket $TicketID deleted as it was used by User <yellow>$ItemID</yellow>\n");
             }
         }
         elsif (@TicketIDs) {
@@ -172,22 +172,20 @@ sub Run {
             next ITEMID;
         }
 
-        # delete customer user
-        my $Success = $DevCustomerUserObject->UserDelete(
+        my $Success = $DevUserObject->UserDelete(
             UserID => $ItemID,
         );
-
         if ( !$Success ) {
-            $Self->PrintError("Can't delete User $ItemID!\n");
+            $Self->PrintError("Can't delete user $ItemID!\n");
             $Failed = 1;
             next ITEMID;
         }
 
-        $Self->Print("  Deleted User <yellow>$ItemID</yellow>\n");
+        $Self->Print("  Deleted user <yellow>$ItemID</yellow>\n");
     }
 
     if ($Failed) {
-        $Self->PrintError("Not all Users where deleted\n");
+        $Self->PrintError("Not all users where deleted\n");
         return $Self->ExitCodeError();
     }
 
