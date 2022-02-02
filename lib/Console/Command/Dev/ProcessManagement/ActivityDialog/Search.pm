@@ -30,7 +30,7 @@ sub Configure {
 
     $Self->AddOption(
         Name        => 'name',
-        Description => "Search Activities with specified ActivityDialog name e.g. *MyActivityDialog*.",
+        Description => "Search activity diaglogs with specified activity dialog name e.g. *MyActivityDialog*.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -42,13 +42,13 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Listing Activity Dialogs...</yellow>\n");
+    $Self->Print("<yellow>Listing Process Management Activity Dialogs...</yellow>\n");
 
     my %SearchOptions;
 
     my %List;
 
-    # Process name search
+    # Activity Dialog name search.
     if ( $Self->GetOption('name') ) {
         $SearchOptions{UserLogin} = $Self->GetOption('name');
     }
@@ -67,7 +67,6 @@ sub Run {
 
     my @ItemIDs = sort { $a cmp $b } keys %List;
 
-    # to store all item details
     my @Items;
 
     ITEM:
@@ -75,14 +74,12 @@ sub Run {
 
         next ITEM if !$ItemID;
 
-        # get item details
         my $Item = $ActivityDialogObject->ActivityDialogGet(
             ID     => $ItemID,
             UserID => 1,
         );
         next ITEM if !$Item;
 
-        # store item details
         push @Items, $Item,;
     }
 
@@ -93,15 +90,15 @@ sub Run {
         return $Self->ExitCodeOk();
     }
 
-    $Self->OutputTable(
-        Items        => \@Items,
-        Columns      => [ 'ID', 'EntityID', 'Name', ],
-        ColumnLength => {
-            ID       => 20,
-            EntityID => 50,
-            Name     => 30,
+    my $FormattedOutput = $Self->TableOutput(
+        TableData => {
+            Header => [ 'ID', 'EntityID', 'Name', ],
+            Body   => [ map { [ $_->{ID}, $_->{EntityID}, $_->{Name}, ] } @Items ],
         },
+        Indention => 2,
     );
+
+    $Self->Print("$FormattedOutput");
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();

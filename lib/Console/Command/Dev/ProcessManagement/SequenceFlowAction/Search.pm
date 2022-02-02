@@ -30,7 +30,7 @@ sub Configure {
 
     $Self->AddOption(
         Name        => 'name',
-        Description => "Search Activities with specified SequenceFlowAction name e.g. *MySequenceFlowAction*.",
+        Description => "Search Activities with specified sequence flow action name e.g. *MySequenceFlowAction*.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -48,7 +48,7 @@ sub Run {
 
     my %List;
 
-    # Process name search
+    # Sequence Flow Action name search.
     if ( $Self->GetOption('name') ) {
         $SearchOptions{UserLogin} = $Self->GetOption('name');
     }
@@ -67,7 +67,6 @@ sub Run {
 
     my @ItemIDs = sort { $a cmp $b } keys %List;
 
-    # to store all item details
     my @Items;
 
     ITEM:
@@ -75,33 +74,31 @@ sub Run {
 
         next ITEM if !$ItemID;
 
-        # get item details
         my $Item = $SequenceFlowActionObject->SequenceFlowActionGet(
             ID     => $ItemID,
             UserID => 1,
         );
         next ITEM if !$Item;
 
-        # store item details
         push @Items, $Item,;
     }
 
     if ( !@Items ) {
-        $Self->Print("No Sequence Flow Actions found\n");
+        $Self->Print("No sequence flow actions found\n");
 
         $Self->Print("<green>Done.</green>\n");
         return $Self->ExitCodeOk();
     }
 
-    $Self->OutputTable(
-        Items        => \@Items,
-        Columns      => [ 'ID', 'EntityID', 'Name', ],
-        ColumnLength => {
-            ID       => 20,
-            EntityID => 50,
-            Name     => 30,
+    my $FormattedOutput = $Self->TableOutput(
+        TableData => {
+            Header => [ 'ID', 'EntityID', 'Name', ],
+            Body   => [ map { [ $_->{ID}, $_->{EntityID}, $_->{Name}, ] } @Items ],
         },
+        Indention => 2,
     );
+
+    $Self->Print("$FormattedOutput");
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();

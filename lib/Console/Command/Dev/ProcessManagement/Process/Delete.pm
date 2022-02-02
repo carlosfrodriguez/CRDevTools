@@ -10,7 +10,7 @@
 # otrs is Copyright (C) 2001-2022 OTRS AG, http://otrs.com/
 # --
 
-package Console::Command::Dev::ProcessManagement::Delete;
+package Console::Command::Dev::ProcessManagement::Process::Delete;
 
 use strict;
 use warnings;
@@ -25,10 +25,10 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Delete one or more Processes.');
+    $Self->Description('Delete one or more Process Management Processes.');
     $Self->AddOption(
         Name        => 'id',
-        Description => "Specify one or more Process ids of Processes to be deleted.",
+        Description => "Specify one or more process ids of processes to be deleted.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/\d+/smx,
@@ -36,7 +36,7 @@ sub Configure {
     );
     $Self->AddOption(
         Name        => 'id-range',
-        Description => "Specify a range of Process ids to be deleted. (e.g. 1..10)",
+        Description => "Specify a range of process ids to be deleted. (e.g. 1..10)",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/\d+\.\.\d+/smx,
@@ -44,7 +44,7 @@ sub Configure {
     );
     $Self->AddOption(
         Name        => 'all',
-        Description => "Deletes all Processes.",
+        Description => "Deletes all processes.",
         Required    => 0,
         HasValue    => 0,
         ValueRegex  => qr/.*/smx,
@@ -74,7 +74,7 @@ sub PreRun {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Deleting Processes...</yellow>\n");
+    $Self->Print("<yellow>Deleting Process Management Processes...</yellow>\n");
 
     my $ProcessObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::Process');
 
@@ -87,7 +87,7 @@ sub Run {
         my $Success = $DevProcessObject->ProcessRemoveAll();
 
         if ( !$Success ) {
-            $Self->PrintError("Not all Processes where deleted\n");
+            $Self->PrintError("Not all processes where deleted\n");
             return $Self->ExitCodeError();
         }
 
@@ -120,7 +120,7 @@ sub Run {
 
         # check if item exists
         if ( !$Item ) {
-            $Self->PrintError("The Process with ID $ItemID does not exist!\n");
+            $Self->PrintError("The process with ID $ItemID does not exist!\n");
             $Failed = 1;
             next ITEMID;
         }
@@ -132,25 +132,25 @@ sub Run {
         );
 
         if ( !$Success ) {
-            $Self->PrintError("Can't delete Process $ItemID!\n");
+            $Self->PrintError("Can't delete process $ItemID!\n");
             $Failed = 1;
             next ITEMID;
         }
 
-        $Self->Print("  Deleted Process <yellow>$ItemID</yellow>\n");
+        $Self->Print("  Deleted process <yellow>$ItemID</yellow>\n");
     }
 
     my $Result = $DevProcessObject->ProcessDeploy();
 
     if ( !$Result || !$Result->{Success} ) {
-        $Self->PrintError("There was an error synchronizing the Processes.");
+        $Self->PrintError("There was an error synchronizing the processes.");
         if ( $Result->{Message} ) {
             $Self->PrintError("$Result->{Message}\n");
         }
     }
 
     if ($Failed) {
-        $Self->PrintError("Not all Processes where deleted\n");
+        $Self->PrintError("Not all processes where deleted\n");
         return $Self->ExitCodeError();
     }
 

@@ -25,10 +25,10 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Delete one or more Activities.');
+    $Self->Description('Delete one or more Process Management Activity Dialogs.');
     $Self->AddOption(
         Name        => 'id',
-        Description => "Specify one or more ActivityDialog ids of Activity Dialogs to be deleted.",
+        Description => "Specify one or more activity dialog ids of activity dialogs to be deleted.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/\d+/smx,
@@ -36,7 +36,7 @@ sub Configure {
     );
     $Self->AddOption(
         Name        => 'id-range',
-        Description => "Specify a range of ActivityDialog ids to be deleted. (e.g. 1..10)",
+        Description => "Specify a range of activity dialog ids to be deleted. (e.g. 1..10)",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/\d+\.\.\d+/smx,
@@ -66,7 +66,7 @@ sub PreRun {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Deleting Activity Dialogs...</yellow>\n");
+    $Self->Print("<yellow>Deleting Process Management Activity Dialogs...</yellow>\n");
 
     my $ActivityDialogObject = $Kernel::OM->Get('Kernel::System::ProcessManagement::DB::ActivityDialog');
 
@@ -87,45 +87,40 @@ sub Run {
 
         next ITEMID if !$ItemID;
 
-        # get item details
         my $Item = $ActivityDialogObject->ActivityDialogGet(
             ID     => $ItemID,
             UserID => 1,
         );
-
-        # check if item exists
         if ( !$Item ) {
             $Self->PrintError("The ActivityDialog with ID $ItemID does not exist!\n");
             $Failed = 1;
             next ITEMID;
         }
 
-        # delete Type
         my $Success = $ActivityDialogObject->ActivityDialogDelete(
             ID     => $ItemID,
             UserID => 1,
         );
-
         if ( !$Success ) {
-            $Self->PrintError("Can't delete ActivityDialog $ItemID!\n");
+            $Self->PrintError("Can't delete activity dialog $ItemID!\n");
             $Failed = 1;
             next ITEMID;
         }
 
-        $Self->Print("  Deleted ActivityDialog <yellow>$ItemID</yellow>\n");
+        $Self->Print("  Deleted activity dialog <yellow>$ItemID</yellow>\n");
     }
 
     my $Result = $Kernel::OM->Get('Dev::Process')->ProcessDeploy();
 
     if ( !$Result || !$Result->{Success} ) {
-        $Self->PrintError("There was an error synchronizing the Processes.");
+        $Self->PrintError("There was an error synchronizing the processes.");
         if ( $Result->{Message} ) {
             $Self->PrintError("$Result->{Message}\n");
         }
     }
 
     if ($Failed) {
-        $Self->PrintError("Not all Activity Dialogs where deleted\n");
+        $Self->PrintError("Not all activity dialogs where deleted\n");
         return $Self->ExitCodeError();
     }
 

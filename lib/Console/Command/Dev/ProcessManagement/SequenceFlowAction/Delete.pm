@@ -25,10 +25,10 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Delete one or more Activities.');
+    $Self->Description('Delete one or more Process Management Sequence Flow Actions.');
     $Self->AddOption(
         Name        => 'id',
-        Description => "Specify one or more SequenceFlowAction ids of Sequence Flow Actions to be deleted.",
+        Description => "Specify one or more sequence flow action ids of sequence flow actions to be deleted.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/\d+/smx,
@@ -36,7 +36,7 @@ sub Configure {
     );
     $Self->AddOption(
         Name        => 'id-range',
-        Description => "Specify a range of SequenceFlowAction ids to be deleted. (e.g. 1..10)",
+        Description => "Specify a range of sequence flow action ids to be deleted. (e.g. 1..10)",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/\d+\.\.\d+/smx,
@@ -87,32 +87,27 @@ sub Run {
 
         next ITEMID if !$ItemID;
 
-        # get item details
         my $Item = $SequenceFlowActionObject->SequenceFlowActionGet(
             ID     => $ItemID,
             UserID => 1,
         );
-
-        # check if item exists
         if ( !$Item ) {
-            $Self->PrintError("The SequenceFlowAction with ID $ItemID does not exist!\n");
+            $Self->PrintError("The sequence flow action with ID $ItemID does not exist!\n");
             $Failed = 1;
             next ITEMID;
         }
 
-        # delete Type
         my $Success = $SequenceFlowActionObject->SequenceFlowActionDelete(
             ID     => $ItemID,
             UserID => 1,
         );
-
         if ( !$Success ) {
-            $Self->PrintError("Can't delete SequenceFlowAction $ItemID!\n");
+            $Self->PrintError("Can't delete sequence flow action $ItemID!\n");
             $Failed = 1;
             next ITEMID;
         }
 
-        $Self->Print("  Deleted SequenceFlowAction <yellow>$ItemID</yellow>\n");
+        $Self->Print("  Deleted sequence flow action <yellow>$ItemID</yellow>\n");
     }
 
     my $Result = $Kernel::OM->Get('Dev::Process')->ProcessDeploy();
@@ -125,7 +120,7 @@ sub Run {
     }
 
     if ($Failed) {
-        $Self->PrintError("Not all Sequence Flow Actions where deleted\n");
+        $Self->PrintError("Not all sequence flow actions where deleted\n");
         return $Self->ExitCodeError();
     }
 

@@ -10,7 +10,7 @@
 # otrs is Copyright (C) 2001-2022 OTRS AG, http://otrs.com/
 # --
 
-package Console::Command::Dev::ProcessManagement::DeleteTickets;
+package Console::Command::Dev::ProcessManagement::DeleteProcessTickets;
 
 use strict;
 use warnings;
@@ -35,9 +35,9 @@ sub Run {
 
     $Self->Print("<yellow>Deleting Process Tickets...</yellow>\n");
 
-    my $ProcessIDDF = $Kernel::OM->Get('Kernel::Config')->Get('Process::DynamicFieldProcessManagementProcessID');
+    my $FieldName = $Kernel::OM->Get('Kernel::Config')->Get('Process::DynamicFieldProcessManagementProcessID');
 
-    if ( !$ProcessIDDF ) {
+    if ( !$FieldName ) {
         $Self->PrintError("Could not get DynamicField used for ProcessID from the system configuration\n");
         return $Self->ExitCodeError();
     }
@@ -46,13 +46,13 @@ sub Run {
 
     # Search all process tickets.
     my @TicketIDs = $TicketObject->TicketSearch(
-        Result                      => 'ARRAY',
-        UserID                      => 1,
-        SortBy                      => 'Age',
-        OrderBy                     => 'Up',
-        ContentSearch               => 'OR',
-        FullTextIndex               => 1,
-        "DynamicField_$ProcessIDDF" => {
+        Result                    => 'ARRAY',
+        UserID                    => 1,
+        SortBy                    => 'Age',
+        OrderBy                   => 'Up',
+        ContentSearch             => 'OR',
+        FullTextIndex             => 1,
+        "DynamicField_$FieldName" => {
             Like => '****',
         },
     );
@@ -72,32 +72,27 @@ sub Run {
 
         next TICKETID if $TicketID == 1;
 
-        # Get ticket details.
         my %Ticket = $TicketObject->TicketGet(
             TicketID => $TicketID,
             UserID   => 1,
         );
-
-        # Check if ticket exists.
         if ( !%Ticket ) {
             $Self->PrintError("The ticket with ID $TicketID does not exist!\n");
             $Failed = 1;
             next TICKETID;
         }
 
-        # Delete ticket.
         my $Success = $TicketObject->TicketDelete(
             TicketID => $TicketID,
             UserID   => 1,
         );
-
         if ( !$Success ) {
             $Self->PrintError("Can't delete ticket $TicketID\n");
             $Failed = 1;
+            next TICKETID;
         }
-        else {
-            $Self->Print(" Deleted ticket $TicketID\n");
-        }
+
+        $Self->Print(" Deleted ticket $TicketID\n");
     }
 
     if ($Failed) {

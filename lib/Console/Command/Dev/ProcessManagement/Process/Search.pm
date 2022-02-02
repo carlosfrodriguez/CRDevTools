@@ -10,7 +10,7 @@
 # otrs is Copyright (C) 2001-2022 OTRS AG, http://otrs.com/
 # --
 
-package Console::Command::Dev::ProcessManagement::Search;
+package Console::Command::Dev::ProcessManagement::Process::Search;
 
 use strict;
 use warnings;
@@ -25,11 +25,11 @@ our @ObjectDependencies = (
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Search Processes in the system.');
+    $Self->Description('Search Process Management Processes in the system.');
 
     $Self->AddOption(
         Name        => 'name',
-        Description => "Search Processes with specified Process name e.g. *MyProcess*.",
+        Description => "Search processes with specified process name e.g. *MyProcess*.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
@@ -41,7 +41,7 @@ sub Configure {
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Listing Processes...</yellow>\n");
+    $Self->Print("<yellow>Listing Process Management Processes...</yellow>\n");
 
     my %SearchOptions;
 
@@ -66,7 +66,6 @@ sub Run {
 
     my @ItemIDs = sort { $a cmp $b } keys %List;
 
-    # to store all item details
     my @Items;
 
     ITEM:
@@ -74,33 +73,31 @@ sub Run {
 
         next ITEM if !$ItemID;
 
-        # get item details
         my $Item = $ProcessObject->ProcessGet(
             ID     => $ItemID,
             UserID => 1,
         );
         next ITEM if !$Item;
 
-        # store item details
         push @Items, $Item,;
     }
 
     if ( !@Items ) {
-        $Self->Print("No Processes found\n");
+        $Self->Print("No processes found\n");
 
         $Self->Print("<green>Done.</green>\n");
         return $Self->ExitCodeOk();
     }
 
-    $Self->OutputTable(
-        Items        => \@Items,
-        Columns      => [ 'ID', 'EntityID', 'Name', ],
-        ColumnLength => {
-            ID       => 20,
-            EntityID => 50,
-            Name     => 30,
+    my $FormattedOutput = $Self->TableOutput(
+        TableData => {
+            Header => [ 'ID', 'EntityID', 'Name', ],
+            Body   => [ map { [ $_->{ID}, $_->{EntityID}, $_->{Name}, ] } @Items ],
         },
+        Indention => 2,
     );
+
+    $Self->Print("$FormattedOutput");
 
     $Self->Print("<green>Done.</green>\n");
     return $Self->ExitCodeOk();
