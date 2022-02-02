@@ -83,8 +83,6 @@ sub Run {
 
     $Self->Print("<yellow>Deleting users...</yellow>\n");
 
-    my %SearchOptions;
-
     my $Login = $Self->GetOption('login');
 
     my $UserObject = $Kernel::OM->Get('Kernel::System::User');
