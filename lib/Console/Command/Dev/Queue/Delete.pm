@@ -106,17 +106,15 @@ sub Run {
 
     my $Failed;
 
+    my %QueueList = $QueueObject->QueueList( Valid => 0 );
+
     ITEMID:
     for my $ItemID (@ItemsToDelete) {
 
         next ITEMID if !$ItemID;
 
-        my $Queue = $QueueObject->QueueLookup(
-            QueueID => $ItemID,
-        );
-        if ( !$Queue ) {
-            $Self->PrintError("The Queue with ID $ItemID does not exist!\n");
-            $Failed = 1;
+        if ( !$QueueList{$ItemID} ) {
+            $Self->Print("<yellow>The Queue with ID $ItemID does not exist, skipping... </yellow>\n");
             next ITEMID;
         }
 

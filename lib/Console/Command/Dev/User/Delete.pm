@@ -108,7 +108,7 @@ sub Run {
         }
         elsif ($Login) {
             my %User = $UserObject->GetUserData(
-                User => $Login,
+                UserLogin => $Login,
             );
             $List{ $User{UserLogin} } = $User{UserEmail};
         }
@@ -120,20 +120,19 @@ sub Run {
     my $DevUserObject = $Kernel::OM->Get('Dev::User');
     my $TicketObject  = $Kernel::OM->Get('Kernel::System::Ticket');
 
+    my %UserList = $UserObject->UserList(
+        Type  => 'Short',
+        Valid => 0,
+    );
+
     ITEMID:
     for my $ItemID (@ItemsToDelete) {
 
         next ITEMID if !$ItemID;
 
-        # get item details
-        my %Item = $UserObject->GetUserData(
-            UserID => $ItemID,
-        );
-
         # check if item exists
-        if ( !%Item ) {
-            $Self->PrintError("The user with ID $ItemID does not exist!\n");
-            $Failed = 1;
+        if ( !$UserList{$ItemID} ) {
+            $Self->Print("<yellow>The user with ID $ItemID does not exist, skipping... </yellow>\n");
             next ITEMID;
         }
 

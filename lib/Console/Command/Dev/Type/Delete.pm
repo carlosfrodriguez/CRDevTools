@@ -90,6 +90,8 @@ sub Run {
 
     my $DevTypeObject = $Kernel::OM->Get('Dev::Type');
 
+    my %TypeList = $TypeObject->TypeList( Valid => 0 );
+
     my $Failed;
 
     ITEMID:
@@ -97,13 +99,10 @@ sub Run {
 
         next ITEMID if !$ItemID;
 
-        my %Item = $TypeObject->TypeGet(
-            ID     => $ItemID,
-            UserID => 1,
-        );
-        if ( !%Item ) {
-            $Self->PrintError("The type with ID $ItemID does not exist!\n");
-            $Failed = 1;
+        my $Type = $TypeList{$ItemID};
+
+        if ( !$TypeList{$ItemID} ) {
+            $Self->Print("<yellow>The type with ID $ItemID does not exist, skipping... </yellow>\n");
             next ITEMID;
         }
 
