@@ -56,7 +56,7 @@ sub Run {
     my $DynamicFieldObject = $Kernel::OM->Get('Kernel::System::DynamicField');
 
     my $Version = $Kernel::OM->Get('Kernel::Config')->Get('Version');
-    $Version = substr $Version, 0, 1;
+    my ($MajorVersion) = $Version =~ m{\A(\d+)\.}msx;
 
     if (%SearchOptions) {
         %List = $Kernel::OM->Get('Dev::DynamicField')->DynamicFieldSearch(
@@ -64,11 +64,14 @@ sub Run {
         );
     }
     else {
-        if ( $Version >= 8 ) {
+        if ( $MajorVersion >= 8 ) {
             %List = %{
                 $DynamicFieldObject->FieldList(
                     ResultType => 'HASH',
-                    UserID     => 1,
+                    Filter     => {
+                        Valid => 0,
+                    },
+                    UserID => 1,
                 )
             };
         }
@@ -76,6 +79,7 @@ sub Run {
             %List = %{
                 $DynamicFieldObject->DynamicFieldList(
                     ResultType => 'HASH',
+                    Valid      => 0,
                     UserID     => 1,
                 )
             };
@@ -94,7 +98,7 @@ sub Run {
 
         my $Item;
 
-        if ( $Version >= 8 ) {
+        if ( $MajorVersion >= 8 ) {
 
             my $FieldObject = $DynamicFieldObject->FieldGet(
                 ID => $ItemID,

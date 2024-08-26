@@ -161,18 +161,17 @@ sub UserDelete {
         Bind => [ \$Param{UserID}, ],
     );
 
-    my $Version = $Kernel::OM->Get('Kernel::Config')->Get('Version');
-    $Version = substr $Version, 0, 1;
+    my $Version = $ConfigObject->Get('Version');
+    my ($MajorVersion) = $Version =~ m{\A(\d+)\.}msx;
 
     # Delete user configuration
-    if ( $Version >= 8 ) {
+    if ( $MajorVersion >= 8 ) {
         return if !$DBObject->Do(
             SQL => '
             DELETE FROM user_config
             WHERE user_id = ?',
             Bind => [ \$Param{UserID}, ],
         );
-
     }
 
     # get user table

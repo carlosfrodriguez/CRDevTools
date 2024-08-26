@@ -126,9 +126,13 @@ sub GroupDelete {
     );
 
     my $GroupTable = 'group';
-    my $Version    = $Kernel::OM->Get('Kernel::Config')->Get('Version');
-    $Version = substr $Version, 0, 1;
-    if ( $Version >= 7 ) {
+
+    my $ConfigObject = $Kernel::OM->Get('Kernel::Config');
+
+    my $Version = $ConfigObject->Get('Version');
+    my ($MajorVersion) = $Version =~ m{\A(\d+)\.}msx;
+
+    if ( $MajorVersion >= 7 ) {
         $GroupTable = 'groups_table';
     }
 

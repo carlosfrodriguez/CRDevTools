@@ -84,7 +84,7 @@ sub Run {
     my $Failed;
 
     my $Version = $Kernel::OM->Get('Kernel::Config')->Get('Version');
-    $Version = substr $Version, 0, 1;
+    my ($MajorVersion) = $Version =~ m{\A(\d+)\.}msx;
 
     ITEMID:
     for my $ItemID (@ItemsToDelete) {
@@ -93,7 +93,7 @@ sub Run {
 
         my $Success;
 
-        if ( $Version >= 8 ) {
+        if ( $MajorVersion >= 8 ) {
             my $FieldObject = $DynamicFieldObject->FieldGet(
                 ID => $ItemID,
             );
