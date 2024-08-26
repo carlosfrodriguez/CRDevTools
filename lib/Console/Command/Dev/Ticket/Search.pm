@@ -115,12 +115,16 @@ sub Run {
         $SearchOptions{OwnerIDs} = [$UserID];
     }
 
+    $SearchOptions{TicketCreateTimeNewerDate} = '1900-10-10 00:00:00';
+
     my $TicketObject = $Kernel::OM->Get('Kernel::System::Ticket');
 
     my @ItemIDs = $TicketObject->TicketSearch(
-        Result  => 'ARRAY',
-        UserID  => 1,
-        SortBy  => 'ID',
+        Result => 'ARRAY',
+        UserID => 1,
+        SortBy => 'ID',      # for OTRS 8
+
+        # SortBy  => 'Age', # for OTRS 7
         OrderBy => 'Up',
         %SearchOptions,
     );
