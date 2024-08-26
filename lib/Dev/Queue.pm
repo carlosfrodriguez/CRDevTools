@@ -88,9 +88,11 @@ sub QueueDelete {
     # set QueueID
     my $QueueID = $Param{QueueID} || '';
     if ( !$QueueID ) {
-        my $QueueID = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+        no warnings qw(once);    ## no critic
+        $QueueID = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
             Queue => $Param{Queue},
         );
+        use warnings;
     }
     if ( !$QueueID ) {
         $Kernel::OM->Get('Kernel::System::Log')->Log(
