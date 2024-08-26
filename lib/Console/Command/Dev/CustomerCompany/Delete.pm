@@ -75,7 +75,7 @@ sub Run {
 
     # CustomerCompany name search
     if ($Name) {
-        $SearchOptions{CutomerCompanyName} = $Name;
+        $SearchOptions{CustomerCompanyName} = $Name;
     }
     if ( $ID && $ID =~ m{\*}x ) {
         $SearchOptions{CustomerID} = $ID;
