@@ -89,6 +89,7 @@ sub Run {
         $Item->{Name}   = $VersionRef->{Name}   || $Item->{Name}         || '';
         $Item->{Number} = $VersionRef->{Number} || $Item->{Number}       || '';
         $Item->{ID}     = $VersionRef->{ID}     || $Item->{ConfigItemID} || '';
+        $Item->{Class}  = $VersionRef->{Class}  || $Item->{Class}        || '';
 
         # Store item details.
         push @Items, $Item,;
@@ -103,8 +104,8 @@ sub Run {
 
     my $FormattedOutput = $Self->TableOutput(
         TableData => {
-            Header => [ 'ID', 'Name', 'Number', ],
-            Body   => [ map { [ $_->{ID}, $_->{Name}, $_->{Number} ] } @Items ],
+            Header => [ 'ID', 'Name', 'Class', 'Number', ],
+            Body   => [ map { [ $_->{ID}, $_->{Name}, $_->{Class}, $_->{Number} ] } @Items ],
         },
         Indention => 2,
     );

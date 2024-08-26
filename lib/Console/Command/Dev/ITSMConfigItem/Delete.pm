@@ -114,10 +114,10 @@ sub Run {
 
         next ITEMID if !$ItemID;
 
-        my %Item = $ITSMConfigItemObject->ConfigItemGet(
+        my $Item = $ITSMConfigItemObject->ConfigItemGet(
             ConfigItemID => $ItemID,
         );
-        if ( !%Item ) {
+        if ( ref $Item ne 'HASH' ) {
             $Self->PrintError("The ITSM config item with ConfigItemID $ItemID does not exist!\n");
             $Failed = 1;
             next ITEMID;
