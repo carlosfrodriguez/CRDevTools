@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2022 Carlos Rodriguez, https://github.com/carlosfrodriguez
+# Copyright (C) 2001-2024 OTRS AG, https://otrs.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
@@ -17,8 +17,11 @@ package Console::BaseCommand;
 use strict;
 use warnings;
 
+use Getopt::Long();
 use Term::ANSIColor();
 use IO::Interactive();
+use Encode::Locale();
+
 use File::Basename qw(dirname);
 
 use FindBin qw($RealBin);
@@ -29,15 +32,20 @@ use lib dirname($RealBin) . "/Kernel/cpan-lib";
 use lib ".";
 use lib "./Kernel/cpan-lib";
 
-use Getopt::Long();
-
-use Encode;
-
+$Term::ANSIColor::EACHLINE = "\n";
 our $SuppressANSI = 0;
+
+our @ObjectDependencies = (
+    'Kernel::System::Cache',
+);
 
 =head1 NAME
 
 Console::BaseCommand - command base class
+
+=head1 DESCRIPTION
+
+Base class for console commands.
 
 =head1 PUBLIC INTERFACE
 
@@ -52,7 +60,7 @@ sub new {
     my ( $Type, %Param ) = @_;
 
     my $Self = {};
-    bless $Self, $Type;
+    bless( $Self, $Type );
 
     # for usage help
     $Self->{Name} = $Type;
@@ -96,8 +104,6 @@ sub new {
             Invisible => 1,    # hide from usage screen
         },
     ];
-
-    $Self->{Config} = $Self->_GetConfig();
 
     return $Self;
 }
@@ -243,7 +249,7 @@ indicate which arguments it can process.
         Multiple     => 0,  # optional, allow more than one occurrence (only possible if HasValue is true)
     );
 
-=head3 Option Naming Conventions
+B<Option Naming Conventions>
 
 If there is a source and a target involved in the command, the related options should start
 with C<--source> and C<--target>, for example C<--source-path>.
@@ -299,7 +305,6 @@ sub AddOption {
     push @{ $Self->{_Options} }, \%Param;
 
     return;
-
 }
 
 =head2 GetOption()
@@ -325,6 +330,7 @@ sub GetOption {
     }
 
     return $Self->{_ParsedARGV}->{Options}->{$Option};
+
 }
 
 =head2 PreRun()
@@ -382,23 +388,32 @@ If that was OK, the Run() method of the command will be called.
 sub Execute {
     my ( $Self, @CommandlineArguments ) = @_;
 
-    my $ParsedGlobalOptions = $Self->_ParseGlobalOptions( \@CommandlineArguments );
+    # Normally, nothing was logged until this point, so the LogObject does not exist yet.
+    #   Change the LogPrefix so that it indicates which command causes the log entry.
+    #   In future we might need to check if it was created and update it on the fly.
+    $Kernel::OM->ObjectParamAdd(
+        'Kernel::System::Log' => {
+            LogPrefix => 'OTRS-otrs.Console.pl-' . $Self->Name(),
+        },
+    );
 
-    # Store allow root global option for future use.
-    if ( $ParsedGlobalOptions->{'allow-root'} ) {
-        $Self->{AllowRoot} = 1;
-    }
+    my $ParsedGlobalOptions = $Self->_ParseGlobalOptions( \@CommandlineArguments );
 
     # Don't allow to run these scripts as root.
     if ( !$ParsedGlobalOptions->{'allow-root'} && $> == 0 ) {    # $EFFECTIVE_USER_ID
         $Self->PrintError(
-            "You cannot run otrs.ModuleTools.pl as root. Please run it as the 'otrs' user or with the help of su:"
+            "You cannot run cr.DevTools.pl as root. Please run it as the 'otrs' user or with the help of su:"
         );
-        $Self->Print("  <yellow>su -c \"bin/otrs.ModuleTools.pl MyCommand\" -s /bin/bash otrs</yellow>\n");
+        $Self->Print("  <yellow>su -c \"bin/cr.DevTools.pl MyCommand\" -s /bin/bash otrs</yellow>\n");
         return $Self->ExitCodeError();
     }
 
-    # Only run if the command was setup OM.
+    # Disable in-memory cache to avoid problems with long running scripts.
+    $Kernel::OM->Get('Kernel::System::Cache')->Configure(
+        CacheInMemory => 0,
+    );
+
+    # Only run if the command was setup OK.
     if ( !$Self->{_ConfigureSuccessful} ) {
         $Self->PrintError("Aborting because the command was not successfully configured.");
         return $Self->ExitCodeError();
@@ -516,7 +531,7 @@ sub GetUsageHelp {
         if ( $Option->{HasValue} ) {
             $OptionShort .= " ...";
             if ( $Option->{Multiple} ) {
-                $OptionShort .= "(+)";
+                $OptionShort .= "($OptionShort)";
             }
         }
         if ( !$Option->{Required} ) {
@@ -615,7 +630,7 @@ sub Print {
 
 =head2 TableOutput()
 
-this method generates an ascii table of headers and column content
+This method generates an ASCII table of headers and column content.
 
     my $FormattedOutput = $Command->TableOutput(
         TableData => {
@@ -631,9 +646,7 @@ this method generates an ascii table of headers and column content
                 [ 'FirstItem 4', 'SecondItem 4', 'ThirdItem 4' ],
             ],
         },
-        Indention => 2, # Spaces to indent (ltr), default 0;
-        EvenOdd   => 'yellow', # add even and odd line coloring (green|yellow|red)
-                               # (overwrites existing coloring), # default 0
+        Indention => 2, # Spaces to indent (ltr), default 0
     );
 
     Returns:
@@ -642,9 +655,9 @@ this method generates an ascii table of headers and column content
     | First Header | Second Header | Third Header |
     +--------------+---------------+--------------+
     | FirstItem 1  | SecondItem 1  | ThirdItem 1  |
-    | FirstItem 2  | SecondItem 2  | ThirdItem 1  |
-    | FirstItem 3  | SecondItem 3  | ThirdItem 1  |
-    | FirstItem 4  | SecondItem 4  | ThirdItem 1  |
+    | FirstItem 2  | SecondItem 2  | ThirdItem 2  |
+    | FirstItem 3  | SecondItem 3  | ThirdItem 3  |
+    | FirstItem 4  | SecondItem 4  | ThirdItem 4  |
     +--------------+---------------+--------------+
 
 =cut
@@ -652,192 +665,58 @@ this method generates an ascii table of headers and column content
 sub TableOutput {
     my ( $Self, %Param ) = @_;
 
-    return if $Param{TableData}->{Header} && !IsArrayRefWithData( $Param{TableData}->{Header} );
-    return if $Param{TableData}->{Body}   && !IsArrayRefWithData( $Param{TableData}->{Body} );
+    return if !IsHashRefWithData( $Param{TableData} );
 
+    my $Body = $Param{TableData}->{Body};
+
+    return if !IsArrayRefWithData($Body);
+
+    my $Header      = $Param{TableData}->{Header};
+    my $Indention   = $Param{Indention} > 0 ? ' ' x $Param{Indention} : '';
+    my $RemoveColor = sub { return $_[0] =~ s{<.+?>}{}gr; };
+
+    # Calculate column widths.
     my @MaxColumnLength;
 
-    # check for available header row and determine lengths
-    my $ShowHeader = IsArrayRefWithData( $Param{TableData}->{Header} ) ? 1 : 0;
-
-    if ($ShowHeader) {
-
-        my $HeaderCount = 0;
-
-        for my $Header ( @{ $Param{TableData}->{Header} } ) {
-
-            # detect coloring
-            my $PreparedHeader = $Header;
-
-            if ( $PreparedHeader =~ m/<.+?>.+?<\/.+?>/smx ) {
-                $PreparedHeader =~ s{ (<.+?>)(.+?)(<\/.+?>) }{$2}xmsg;
-            }
-
-            # detect header value length
-            if ( !$MaxColumnLength[$HeaderCount] || $MaxColumnLength[$HeaderCount] < length $PreparedHeader ) {
-                $MaxColumnLength[$HeaderCount] = length $PreparedHeader;
-            }
-            $HeaderCount++;
+    for my $Index ( 0 .. $#$Header ) {
+        my $Length = length $RemoveColor->( $Header->[$Index] );
+        $MaxColumnLength[$Index] = $Length if !$MaxColumnLength[$Index] || $MaxColumnLength[$Index] < $Length;
+    }
+    for my $Row ( @{$Body} ) {
+        for my $Index ( 0 .. $#$Row ) {
+            my $Length = length $RemoveColor->( $Row->[$Index] );
+            $MaxColumnLength[$Index] = $Length if !$MaxColumnLength[$Index] || $MaxColumnLength[$Index] < $Length;
         }
     }
 
-    ROW:
-    for my $Row ( @{ $Param{TableData}->{Body} } ) {
+    # Create horizontal border and prepare row formatting.
+    my $HorizontalBorder = join( '', map { '+' . '-' x ( $_ + 2 ) } @MaxColumnLength ) . "+\n";
+    my $Output           = $Indention . $HorizontalBorder;
+    my $FormatRow        = sub {
+        my ( $Row, $FormattedRow ) = ( $_[0], '' );
 
-        next ROW if !$Row;
-        next ROW if !IsArrayRefWithData($Row);
-
-        # determine maximum length of every column
-        my $ColumnCount = 0;
-
-        for my $Column ( @{$Row} ) {
-
-            # detect coloring
-            my $PreparedColumn = $Column || ' ';
-
-            if ( $PreparedColumn =~ m/<.+?>.+?<\/.+?>/smx ) {
-                $PreparedColumn =~ s{ (<.+?>)(.+?)(<\/.+?>) }{$2}xmsg;
-            }
-
-            # detect column value length
-            if ( !$MaxColumnLength[$ColumnCount] || $MaxColumnLength[$ColumnCount] < length $PreparedColumn ) {
-                $MaxColumnLength[$ColumnCount] = length $PreparedColumn;
-            }
-            $ColumnCount++;
-        }
-    }
-
-    # generate horizontal border
-    my $HorizontalBorder = '';
-
-    my $ColumnCount = 0;
-
-    for my $ColumnLength (@MaxColumnLength) {
-
-        # add space character before and after column content
-        $ColumnLength += 2;
-
-        # save new column length in maximum column length array
-        $MaxColumnLength[$ColumnCount] = $ColumnLength;
-
-        # save border part
-        $HorizontalBorder .= '+' . ( '-' x $ColumnLength );
-
-        $ColumnCount++;
-    }
-
-    $HorizontalBorder .= '+';
-
-    if ( $Param{Indention} ) {
-        my $Indention = ' ' x $Param{Indention};
-        $HorizontalBorder = $Indention . $HorizontalBorder;
-    }
-
-    # add first border to output
-    my $Output = $HorizontalBorder . "\n";
-
-    # add header row if available
-    if ($ShowHeader) {
-
-        my $HeaderContent = '';
-        my $HeaderCount   = 0;
-
-        if ( $Param{Indention} ) {
-            my $Indention = ' ' x $Param{Indention};
-            $HeaderContent = $Indention . $HeaderContent;
+        for my $Index ( 0 .. $#$Row ) {
+            my $Cell       = $Row->[$Index] // '';
+            my $CellLength = length $RemoveColor->($Cell);
+            my $Padding    = ' ' x ( $MaxColumnLength[$Index] - $CellLength );
+            $FormattedRow .= "| ${Cell}${Padding} ";
         }
 
-        for my $Header ( @{ $Param{TableData}->{Header} } ) {
+        return $FormattedRow . "|\n";
+    };
 
-            # prepare header content
-            $HeaderContent .= '| ' . $Header;
-
-            # detect coloring
-            if ( $Header =~ m/<.+?>.+?<\/.+?>/smx ) {
-                $Header =~ s{ (<.+?>)(.+?)(<\/.+?>) }{$2}xmsg;
-            }
-
-            # determine difference between current header content and maximum content length
-            my $HeaderContentDiff = ( $MaxColumnLength[$HeaderCount] ) - ( length $Header );
-
-            # fill up with spaces
-            if ($HeaderContentDiff) {
-                $HeaderContent .= ' ' x ( $HeaderContentDiff - 1 );
-            }
-
-            $HeaderCount++;
-        }
-
-        # save the result as output
-        $Output .= $HeaderContent . "|\n";
-
-        # add horizontal border
-        $Output .= $HorizontalBorder . "\n";
+    # Generate formatted header row.
+    if ( IsArrayRefWithData($Header) ) {
+        $Output .= $Indention . $FormatRow->($Header);
+        $Output .= $Indention . $HorizontalBorder;
     }
 
-    my $EvenOddIndicator = 0;
-
-    # add body rows
-    Row:
-    for my $Row ( @{ $Param{TableData}->{Body} } ) {
-
-        next ROW if !$Row;
-        next ROW if !IsArrayRefWithData($Row);
-
-        my $RowContent  = '';
-        my $ColumnCount = 0;
-
-        if ( $Param{Indention} ) {
-            my $Indention = ' ' x $Param{Indention};
-            $RowContent = $Indention . $RowContent;
-        }
-
-        for my $Column ( @{$Row} ) {
-
-            $Column = IsStringWithData($Column) ? $Column : ' ';
-
-            # even and odd coloring
-            if ( $Param{EvenOdd} ) {
-
-                if ( $Column =~ m/<.+?>.+?<\/.+?>/smx ) {
-                    $Column =~ s{ (<.+?>)(.+?)(<\/.+?>) }{$2}xmsg;
-                }
-
-                if ($EvenOddIndicator) {
-                    $Column = "<$Param{EvenOdd}>" . $Column . "</$Param{EvenOdd}>";
-                }
-            }
-
-            # prepare header content
-            $RowContent .= '| ' . $Column;
-
-            # detect coloring
-            if ( $Column =~ m/<.+?>.+?<\/.+?>/smx ) {
-                $Column =~ s{ (<.+?>)(.+?)(<\/.+?>) }{$2}xmsg;
-            }
-
-            # determine difference between current column content and maximum content length
-            my $RowContentDiff = ( $MaxColumnLength[$ColumnCount] ) - ( length $Column );
-
-            # fill up with spaces
-            if ($RowContentDiff) {
-                $RowContent .= ' ' x ( $RowContentDiff - 1 );
-            }
-
-            $ColumnCount++;
-        }
-
-        # toggle even odd indicator
-        $EvenOddIndicator = $EvenOddIndicator ? 0 : 1;
-
-        # save the result as output
-        $Output .= $RowContent . "|\n";
+    # Generate formatted body rows.
+    for my $Row ( @{$Body} ) {
+        $Output .= $Indention . $FormatRow->($Row);
     }
 
-    # add trailing horizontal border
-    $Output .= $HorizontalBorder . "\n";
-
-    return $Output // '';
+    return $Output . $Indention . $HorizontalBorder;
 }
 
 =head2 DirectoryRead()
@@ -909,79 +788,117 @@ sub DirectoryRead {
     return @Results;
 }
 
-=head2 OutputTable()
+# =head2 OutputTable()
 
+# Deprecated!
 
-Deprecated!
+# Outputs the item details in a tabular format.
 
-Outputs the item details in a tabular format.
+#     my $Success = $CommandObject->OutputTable(
+#     Items =>[
+#         {
+#             ID   => 123,
+#             Name => 'ItemName',
+#             # ...
+#         },
+#         # ...
+#     ],
+#     Columns [
+#         'ID',
+#         'Name',
+#         # ...
+#     ],
+#     ColumnLength = {
+#         ID   => 7,
+#         Name => 20,
+#         # ...
+#     };
 
-    my $Success = $CommandObject->OutputTable(
-    Items =>[
-        {
-            ID   => 123,
-            Name => 'ItemName',
-            # ...
-        },
-        # ...
-    ],
-    Columns [
-        'ID',
-        'Name',
-        # ...
-    ],
-    ColumnLength = {
-        ID   => 7,
-        Name => 20,
-        # ...
-    };
+# =cut
 
-=cut
+# sub OutputTable {
+#     my ( $Self, %Param ) = @_;
 
-sub OutputTable {
-    my ( $Self, %Param ) = @_;
+#     $Self->Print("OutputTable() is deprecated update to TableOutput()\n");
 
-    $Self->Print("OutputTable() is deprecated update to TableOutput()\n");
+#     # print header
+#     my $Header = "\n";
+#     for my $HeaderName ( @{ $Param{Columns} } ) {
+#         my $HeaderLength = length $HeaderName;
+#         my $WhiteSpaces;
+#         if ( $HeaderLength < $Param{ColumnLength}->{$HeaderName} ) {
+#             $WhiteSpaces = $Param{ColumnLength}->{$HeaderName} - $HeaderLength;
+#         }
 
-    # print header
-    my $Header = "\n";
-    for my $HeaderName ( @{ $Param{Columns} } ) {
-        my $HeaderLength = length $HeaderName;
-        my $WhiteSpaces;
-        if ( $HeaderLength < $Param{ColumnLength}->{$HeaderName} ) {
-            $WhiteSpaces = $Param{ColumnLength}->{$HeaderName} - $HeaderLength;
-        }
+#         $Header .= sprintf '%-*s', $Param{ColumnLength}->{$HeaderName}, "$HeaderName";
+#     }
+#     $Header .= "\n";
+#     $Header .= '=' x 100;
+#     $Self->Print("$Header\n");
 
-        $Header .= sprintf '%-*s', $Param{ColumnLength}->{$HeaderName}, "$HeaderName";
-    }
-    $Header .= "\n";
-    $Header .= '=' x 100;
-    $Self->Print("$Header\n");
+#     my $Content;
 
-    my $Content;
+#     # print each item row
+#     for my $Item ( @{ $Param{Items} } ) {
 
-    # print each item row
-    for my $Item ( @{ $Param{Items} } ) {
+#         my $Row;
 
-        my $Row;
+#         # print item row
+#         for my $Element ( @{ $Param{Columns} } ) {
+#             my $ElementLength = length $Item->{$Element};
+#             my $WhiteSpaces;
+#             if ( $ElementLength < $Param{ColumnLength}->{$Element} ) {
+#                 $WhiteSpaces = $Param{ColumnLength}->{$Element} - $ElementLength;
+#             }
+#             $Row .= sprintf '%-*s', $Param{ColumnLength}->{$Element}, $Item->{$Element};
+#         }
+#         $Row     .= "\n";
+#         $Content .= $Row;
+#     }
 
-        # print item row
-        for my $Element ( @{ $Param{Columns} } ) {
-            my $ElementLength = length $Item->{$Element};
-            my $WhiteSpaces;
-            if ( $ElementLength < $Param{ColumnLength}->{$Element} ) {
-                $WhiteSpaces = $Param{ColumnLength}->{$Element} - $ElementLength;
-            }
-            $Row .= sprintf '%-*s', $Param{ColumnLength}->{$Element}, $Item->{$Element};
-        }
-        $Row     .= "\n";
-        $Content .= $Row;
-    }
+#     $Self->Print("$Content\n");
 
-    $Self->Print("$Content\n");
+#     return 1;
+# }
+
+sub IsString {    ## no critic
+    my $TestData = $_[0];
+
+    return if scalar @_ != 1;
+    return if ref $TestData;
+    return if !defined $TestData;
 
     return 1;
 }
+
+sub IsArrayRefWithData {    ## no critic
+    my $TestData = $_[0];
+
+    return if scalar @_ != 1;
+    return if ref $TestData ne 'ARRAY';
+    return if !@{$TestData};
+
+    return 1;
+}
+
+sub IsHashRefWithData {     ## no critic
+    return if scalar @_ != 1;
+    return if ref $_[0] ne 'HASH';
+    return if !%{ $_[0] };
+
+    return 1;
+}
+
+sub IsStringWithData {      ## no critic
+    my $TestData = $_[0];
+
+    return if !IsString(@_);
+    return if $TestData eq '';
+
+    return 1;
+}
+
+=head1 INTERNAL
 
 =head2 _ParseGlobalOptions()
 
@@ -1152,59 +1069,13 @@ sub _Color {
 
     return $Text if !$Self->{ANSI};
     return $Text if $SuppressANSI;
-    return Term::ANSIColor::color($Color) . $Text . Term::ANSIColor::color('reset');
+    return Term::ANSIColor::colored( $Text, $Color );
 }
 
 sub _ReplaceColorTags {
     my ( $Self, $Text ) = @_;
     $Text =~ s{<(green|yellow|red)>(.*?)</\1>}{$Self->_Color($1, $2)}gsmxe;
     return $Text;
-}
-
-sub _GetConfig {
-    my $Self = @_;
-
-    my $ModuleToolsDirectory = dirname( dirname( dirname( File::Spec->rel2abs(__FILE__) ) ) );
-
-    my %Config;
-
-    my $ConfigPath = "$ModuleToolsDirectory/etc/config.pl";
-    if ( -e $ConfigPath ) {
-        %Config = %{ do $ConfigPath };
-    }
-
-    $Config{ModuleToolsDirectory} = $ModuleToolsDirectory;
-
-    return \%Config;
-}
-
-sub IsString {    ## no critic
-    my $TestData = $_[0];
-
-    return if scalar @_ != 1;
-    return if ref $TestData;
-    return if !defined $TestData;
-
-    return 1;
-}
-
-sub IsArrayRefWithData {    ## no critic
-    my $TestData = $_[0];
-
-    return if scalar @_ != 1;
-    return if ref $TestData ne 'ARRAY';
-    return if !@{$TestData};
-
-    return 1;
-}
-
-sub IsStringWithData {      ## no critic
-    my $TestData = $_[0];
-
-    return if !IsString(@_);
-    return if $TestData eq '';
-
-    return 1;
 }
 
 1;
