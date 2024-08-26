@@ -135,6 +135,14 @@ sub ServiceDelete {
         Bind => [ \$ServiceID, ],
     );
 
+    # delete from queue services relations
+    return if !$DBObject->Do(
+        SQL => "
+            DELETE FROM queue_service
+            WHERE service_id = ?",
+        Bind => [ \$ServiceID, ],
+    );
+
     # delete Service from DB
     return if !$DBObject->Do(
         SQL => "
@@ -153,7 +161,7 @@ sub ServiceDelete {
 
 =head2 ServiceSearch()
 
-To search Queues
+To search Services
 
     my %List = $DevServiceObject->ServiceSearch(
         Name  => '*some*', # also 'hans+huber' possible
